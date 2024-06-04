@@ -46,7 +46,11 @@
 		<div class="history-item grid-item w-full inline-flex flex-col">
 
 			<p class="bannerType">@bannerTypeName pulls</p>
-			<text>CurrentPity: @(data?.FirstOrDefault().CurrentPity.ToString() ?? "0")</text>
+			<text>Total: @(data?.Total.ToString() ?? "0")</text>
+			<br/>
+			<text>5* pity: @(data?.LegendaryPity.ToString() ?? "0")</text>
+			<br/>
+			<text>4* pity: @(data?.EpicPity.ToString() ?? "0")</text>
 			<br/><br/>
 
 			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName">Open</text>
@@ -74,10 +78,8 @@
 					<tbody>
 					@if (hasPulls)
 					{
-						@foreach (var item in data!)
+						@foreach (var item in data!.Pulls)
 						{
-							var date = $"{item.Time:d}{item.Time:hh:mm}";
-
 							var color = "rarity "
 										+ item.Rarity switch
 										{

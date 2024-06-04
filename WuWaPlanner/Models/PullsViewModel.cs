@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
+using WuWaPlanner.Controllers;
 
 namespace WuWaPlanner.Models;
 
 public class PullsViewModel
 {
-	public IReadOnlyDictionary<BannerType, PullData[]> Data = new Dictionary<BannerType, PullData[]>();
+	public IReadOnlyDictionary<BannerType, BannerData> Data = new Dictionary<BannerType, BannerData>();
 }
 
 public struct PullData
@@ -23,9 +24,6 @@ public struct PullData
 
 	[JsonProperty("pity")]
 	public byte Pity;
-
-	[JsonProperty("currentPity")]
-	public byte CurrentPity;
 }
 
 public enum DropTypeEnum : byte

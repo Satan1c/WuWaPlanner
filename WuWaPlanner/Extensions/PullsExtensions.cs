@@ -6,7 +6,6 @@ public static class PullsExtensions
 {
 	public static IEnumerable<PullData> CalculatePity(this IEnumerable<PullData> pulls)
 	{
-		byte       currentPity   = 0;
 		byte       legendaryPity = 1;
 		byte       epicPity      = 1;
 		const byte commonPity    = 1;
@@ -19,7 +18,6 @@ public static class PullsExtensions
 			{
 				case 5:
 					pull.Pity     = legendaryPity;
-					currentPity   = 0;
 					legendaryPity = 1;
 					epicPity++;
 					break;
@@ -28,18 +26,14 @@ public static class PullsExtensions
 					pull.Pity = epicPity;
 					epicPity  = 1;
 					legendaryPity++;
-					currentPity++;
 					break;
 
 				default:
 					pull.Pity = commonPity;
 					legendaryPity++;
 					epicPity++;
-					currentPity++;
 					break;
 			}
-
-			pull.CurrentPity = currentPity;
 
 			yield return pull;
 		}

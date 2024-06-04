@@ -20,7 +20,7 @@ public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthPr
 		BannerType.Beginner, BannerType.BeginnerSelector, BannerType.BeginnerGiftSelector
 	];
 
-	private static readonly Dictionary<BannerType, PullData[]> s_emptyDictionary   = new();
+	private static readonly Dictionary<BannerType, BannerData> s_emptyDictionary   = new();
 	private readonly        IGoogleAuthProvider                m_authProvider      = authProvider;
 	private readonly        IHttpClientFactory                 m_httpClientFactory = httpClientFactory;
 
@@ -54,7 +54,7 @@ public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthPr
 			}
 		}
 
-		var result = existed is null ? s_emptyDictionary : JsonConvert.DeserializeObject<Dictionary<BannerType, PullData[]>>(existed)!;
+		var result = existed is null ? s_emptyDictionary : JsonConvert.DeserializeObject<Dictionary<BannerType, BannerData>>(existed)!;
 
 		return View(new PullsViewModel { Data = result });
 	}
@@ -96,7 +96,7 @@ public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthPr
 		return RedirectToAction("Pulls");
 	}
 
-	private async ValueTask<Dictionary<BannerType, PullData[]>> GrabData()
+	private async ValueTask<Dictionary<BannerType, BannerData>> GrabData()
 	{
 		var tasks = new Dictionary<BannerType, Task<string>>();
 
@@ -108,13 +108,13 @@ public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthPr
 		var pairs = tasks.Select(
 								 x =>
 								 {
-									 var pulls  = JsonConvert.DeserializeObject<PullDataDto>(x.Value.Result)!.Data;
-									 var result = pulls.Reverse().CalculatePity().Reverse().ToArray();
-									 return new KeyValuePair<BannerType, PullData[]>(x.Key, result);
+									 var pullsRaw = JsonConvert.DeserializeObject<PullDataDto>(x.Value.Result)!.Data;
+									 var result   = new BannerData(pullsRaw);
+									 return new KeyValuePair<BannerType, BannerData>(x.Key, result);
 								 }
 								);
 
-		return new Dictionary<BannerType, PullData[]>(pairs);
+		return new Dictionary<BannerType, BannerData>(pairs);
 	}
 
 	private async Task<string> DoRequest(BannerType bannerType)
@@ -152,11 +152,34 @@ public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthPr
 
 public class PullDataDto
 {
-	[JsonIgnore]
-	public DateTime CreatedAt;
-
 	[JsonProperty("data")]
 	public PullData[] Data = [];
+}
+
+public class BannerData()
+{
+	[JsonProperty("pity4")]
+	public byte EpicPity;
+
+	[JsonProperty("pity5")]
+	public byte LegendaryPity;
+
+	[JsonProperty("pulls")]
+	public PullData[] Pulls = [];
+
+	[JsonProperty("total")]
+	public long Total;
+
+	public BannerData(PullData[] pullsRaw) : this()
+	{
+		var pullsList = pullsRaw.Reverse().CalculatePity().Reverse().ToList();
+		Pulls = pullsList.ToArray();
+		Total = Pulls.LongLength;
+		var legendaryIndex = pullsList.FindIndex(data => data.Rarity == 5);
+		var epicIndex      = pullsList.FindIndex(data => data.Rarity == 4);
+		LegendaryPity = (byte)Math.Max(0, legendaryIndex == -1 ? Total : legendaryIndex);
+		EpicPity      = (byte)Math.Max(0, epicIndex == -1 || Total < 11 ? Total : epicIndex);
+	}
 }
 
 public class PullsRequest
