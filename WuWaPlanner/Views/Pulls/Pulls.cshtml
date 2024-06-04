@@ -1,5 +1,4 @@
-﻿@using System.Globalization
-@using Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using WuWaPlanner.Controllers
 @using WuWaPlanner.Models
 @model PullsViewModel
@@ -18,6 +17,15 @@
 
 			table.style.display = table.style.display === 'none' ? 'table' : 'none';
 			button.target.innerText = table.style.display === 'none' ? 'Open' : 'Close';
+		});
+	});
+
+	document.querySelectorAll('.toggleRarityButton').forEach(button => {
+		button.addEventListener('click', function (b) {
+			console.log(this.getAttribute('data-target'))
+			document.querySelectorAll(this.getAttribute('data-target')).forEach(pull => {
+				pull.style.display = pull.style.display === 'none' ? 'table-row' : 'none';
+			})
 		});
 	});
 </script>
@@ -42,35 +50,62 @@
 			<br/><br/>
 
 			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName">Open</text>
-			<table style="display: none;" class="w-full" id="@bannerTypeName">
-				<thead>
-				<th>Name</th>
-				<th>Pity</th>
-				<th>Time</th>
-				</thead>
+			<br/><br/>
+			<div style="display: none;" id="@bannerTypeName" class="w-full">
+				<div class="grid-container">
+					<div class="grid-item">
+						<text class="toggleRarityButton cursor-pointer" data-target=".@(bannerTypeName).rarity.legendary">5</text>
+					</div>
+					<div class="grid-item">
+						<text class="toggleRarityButton cursor-pointer" data-target=".@(bannerTypeName).rarity.epic">4</text>
+					</div>
+					<div class="grid-item">
+						<text class="toggleRarityButton cursor-pointer" data-target=".@(bannerTypeName).rarity.common">3</text>
+					</div>
+				</div>
 
-				<tbody>
-				@if (hasPulls)
-				{
-					@foreach (var item in data!)
+				<table class="w-full">
+					<thead class="w-full">
+					<th style="align-self: center">Name</th>
+					<th style="align-self: center">Pity</th>
+					<th style="align-self: center">Time</th>
+					</thead>
+
+					<tbody>
+					@if (hasPulls)
 					{
-						var color = "rarity "
-									+ item.Rarity switch
-									{
-										5 => "legendary",
-										4 => "epic",
-										_ => "common"
-									};
+						@foreach (var item in data!)
+						{
+							var date = $"{item.Time:d}{item.Time:hh:mm}";
 
-						<tr class="@color">
-							<th>@item.Name</th>
-							<th>@item.Pity.ToString()</th>
-							<th>@item.Time.ToString(CultureInfo.CurrentCulture)</th>
+							var color = "rarity "
+										+ item.Rarity switch
+										{
+											5 => "legendary",
+											4 => "epic",
+											_ => "common"
+										};
+
+							<tr style="display: @(item.Rarity > 3 ? "table-row" : "none")" class="@(bannerTypeName) @color">
+								<th>@item.Name</th>
+								<th>@item.Pity.ToString()</th>
+								<th>
+									@($"{item.Time:d}")<br/>@($"{item.Time:hh:mm}")
+								</th>
+							</tr>
+						}
+					}
+					else
+					{
+						<tr>
+							<th></th>
+							<th></th>
+							<th></th>
 						</tr>
 					}
-				}
-				</tbody>
-			</table>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	}
 </div>
