@@ -1,0 +1,37 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model WuWaPlanner.Models.PullsDataForm
+@{
+	ViewData["Title"] = "Pulls Import";
+	const string script = """Set-ExecutionPolicy Bypass -Scope Process -Force; [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12; Invoke-Expression (New-Object Net.WebClient).DownloadString("https://gist.githubusercontent.com/Satan1c/8ab58ac8b3dfc24a2582ac5c67e6c95e/raw/53fb6b923ea630111947b2eba894b12e95b3a504/wuwaPlanner.ps1")""";
+}
+
+@section Scripts
+{
+	<script>
+	document.querySelectorAll('.scriptCopy').forEach(text => {
+		text.addEventListener('click', Test);
+	});
+
+	function Test(event) {
+		event.preventDefault();
+		const copyText = document.getElementById("scriptCopy");
+		navigator.clipboard.writeText(copyText.textContent);
+	}
+
+</script>
+}
+
+<label for="scriptCopy">Click to copy:</label><br/>
+<text id="scriptCopy" class="scriptCopy cursor-pointer">@script</text>
+<br/>
+
+<form asp-action="PullsImport" method="post" enctype="multipart/form-data">
+	<label asp-for="Tokens"></label>
+	<input
+		asp-for="Tokens"
+		type="text"
+		name="Tokens"
+		minlength="70" maxlength="80">
+	@Html.ValidationMessageFor(form => form.Tokens)
+	<button type="submit">Scan</button>
+</form>

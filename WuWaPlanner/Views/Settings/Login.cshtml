@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model WuWaPlanner.Models.SettingsLoginForm
+@{
+	ViewData["Title"] = "Login";
+}
+
+@if (ViewData.TryGetValue("Error", out var error))
+{
+	<p class="custom-text">@error</p>
+	<br/>
+}
+
+<form asp-action="Login" method="post" enctype="multipart/form-data">
+	<label asp-for="Login"></label>
+	<input asp-for="Login" type="text" name="Login" minlength="3" maxlength="15">
+	@Html.ValidationMessageFor(form => form.Login)<br/><br/>
+	<label asp-for="Password"></label>
+	<input asp-for="Password" type="password" name="Password" minlength="4" maxlength="15">
+	@Html.ValidationMessageFor(form => form.Password)<br/><br/>
+	<button type="submit">Login</button>
+	@Html.AntiForgeryToken()
+</form>

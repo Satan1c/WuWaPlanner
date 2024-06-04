@@ -1,0 +1,68 @@
+html {
+	font-size: 14px;
+}
+
+@media (min-width: 768px) {
+	html {
+		font-size: 16px;
+	}
+}
+
+.rounded-xl {
+	border-radius: 12px;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.flex-row {
+	flex-direction: row;
+}
+
+.w-full {
+	width: 100%;
+}
+
+.inline-flex {
+	display: inline-flex;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+	box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	background-color: #212e3c;
+	margin-bottom: 60px;
+	margin-right: 0px;
+}
+
+a, button, text, label {
+	background-color: rgba(101, 139, 173, 0.17);
+	border-color: #988846;
+	color: #ffffff;
+}
+
+.custom-text {
+	background-color: rgba(101, 139, 173, 0.17);
+	border-color: #988846;
+	color: #ffffff;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+.flex-wrap {
+	flex-wrap: wrap;
+}
+
+.flex {
+	display: flex;
+}

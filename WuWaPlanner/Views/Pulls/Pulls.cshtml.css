@@ -1,0 +1,112 @@
+﻿a.importbtn, text.toggleTableButton {
+	max-width: 100% !important;
+	align-content: center;
+	text-align: center;
+	background-color: rgba(101, 139, 173, 0.17);
+	border-color: #988846;
+	color: #ffffff;
+}
+
+text.toggleTableButton {
+	border-width: 2px;
+	background-color: rgba(101, 139, 173, 0.17);
+	border-color: #988846;
+	color: #ffffff;
+}
+
+tr.rarity.legendary {
+	color: #FAD981FF
+}
+
+tr.rarity.epic {
+	color: #B195DFFF
+}
+
+tr.rarity.common {
+	color: #7FACF3FF
+}
+
+.bannerType h1, p {
+	color: #ffffff
+}
+
+div {
+	display: block;
+	unicode-bidi: isolate;
+}
+
+div.history-item {
+	text-align: center;
+	background-color: #41376e;
+}
+
+div.title {
+	align-content: center;
+}
+
+@media (min-width: 640px) {
+	div.title {
+		align-content: center;
+		max-width: 100% !important;
+	}
+
+	div.grid-container {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	div.grid-container {
+		margin-left: 25% !important;
+		max-width: 75% !important;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	div.title {
+		align-content: center;
+		margin-left: 25% !important;
+		max-width: 75% !important;
+	}
+}
+
+@media (min-width: 1280px) {
+	div.grid-container {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1664px) {
+	div.grid-container {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 2048px) {
+	div.grid-container {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+	}
+}
+
+div.grid-container {
+	text-align: center;
+	display: grid;
+	gap: 1rem;
+}
+
+table {
+	border-collapse: separate;
+	text-indent: initial;
+	border-spacing: 2px;
+}
+
+thead {
+	display: table-header-group;
+	vertical-align: middle;
+	unicode-bidi: isolate;
+}
+
+tbody {
+	display: table-row-group;
+	vertical-align: middle;
+	unicode-bidi: isolate;
+}

@@ -1,0 +1,97 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using WuWaPlanner.Controllers
+@using WuWaPlanner.Models
+@model PullsViewModel
+
+@{
+	ViewData["Title"] = "Pulls";
+	var pullsData = ViewData.Model.Data;
+}
+
+@section Scripts
+{
+	<script>
+	document.querySelectorAll('.toggleTableButton').forEach(button => {
+		button.addEventListener('click', function (button) {
+			const table = document.getElementById(this.getAttribute('data-target'));
+
+			table.style.display = table.style.display === 'none' ? 'table' : 'none';
+			button.target.innerText = table.style.display === 'none' ? 'Open' : 'Close';
+		});
+	});
+</script>
+}
+
+<div class="title">
+	<a class="importbtn" asp-area="" asp-controller="Pulls" asp-action="PullsImport">
+		<b>Import</b>
+	</a>
+</div>
+
+<div class="history grid-container container flex flex-wrap">
+	@foreach (var bannerType in PullsController.BannerTypes)
+	{
+		var bannerTypeName = bannerType.BannerTypeToString();
+
+		<div class="history-item grid-item w-full inline-flex flex-col">
+
+			<p class="bannerType">@bannerTypeName pulls</p>
+
+			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName">Open</text>
+
+			<table style="display: none;" class="w-full" id="@bannerTypeName">
+				<thead>
+				<th>Name</th>
+				<th>Pity</th>
+				<th>Time</th>
+				</thead>
+
+				<tbody>
+				@if (pullsData.TryGetValue(bannerType, out var data))
+				{
+					byte       legendaryPity = 1;
+					byte       epicPity      = 1;
+					const byte commonPity    = 1;
+
+					@foreach (var item in data)
+					{
+						byte pity;
+						var  color = "rarity ";
+
+						switch (item.Rarity)
+						{
+							case 5:
+								pity          =  legendaryPity;
+								color         += "legendary";
+								legendaryPity =  1;
+								epicPity++;
+								break;
+
+							case 4:
+								pity     =  epicPity;
+								color    += "epic";
+								epicPity =  1;
+								legendaryPity++;
+								break;
+
+							default:
+								pity  =  commonPity;
+								color += "common";
+								legendaryPity++;
+								epicPity++;
+								break;
+						}
+
+						<tr class="@color">
+							<th>@item.Name</th>
+							<th>@pity.ToString()</th>
+							<th>@item.Time.ToString(CultureInfo.CurrentCulture)</th>
+						</tr>
+					}
+				}
+				</tbody>
+			</table>
+		</div>
+	}
+</div>
