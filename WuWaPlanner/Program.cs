@@ -14,7 +14,14 @@ builder.Services.AddAuthentication(
 									   o.DefaultScheme          = CookieAuthenticationDefaults.AuthenticationScheme;
 								   }
 								  )
-	   .AddCookie()
+	   .AddCookie(
+				  options =>
+				  {
+					  options.ExpireTimeSpan    = TimeSpan.FromDays(25);
+					  options.Cookie.MaxAge     = options.ExpireTimeSpan;
+					  options.SlidingExpiration = true;
+				  }
+				 )
 	   .AddGoogleOpenIdConnect(
 							   options =>
 							   {
@@ -31,10 +38,8 @@ builder.Services.AddAuthentication(
 																					 await Task.FromResult(0);
 																				 };
 
-								   options.GetClaimsFromUserInfoEndpoint = true;
-								   options.SaveTokens                    = true;
-
-								   //options.Validate();
+								   options.MaxAge     = TimeSpan.FromDays(1);
+								   options.SaveTokens = true;
 							   }
 							  );
 
@@ -49,7 +54,11 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
-//app.UseCookiePolicy(new CookiePolicyOptions() { Secure = CookieSecurePolicy.Always, MinimumSameSitePolicy = SameSiteMode.Lax });
+/*app.UseCookiePolicy(new CookiePolicyOptions() { Secure = CookieSecurePolicy.Always, OnAppendCookie = context =>
+					{
+						//context.CookieOptions.IsEssential = true;
+						context.CookieOptions.MaxAge      = TimeSpan.FromDays(25);
+					}});*/
 app.UseCookiePolicy();
 
 app.UseHttpsRedirection();
