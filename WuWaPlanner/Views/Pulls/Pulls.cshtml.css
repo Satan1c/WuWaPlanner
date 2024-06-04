@@ -44,46 +44,45 @@ div.title {
 	align-content: center;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 750px) {
+	div.grid-container {
+		max-width: 100% !important;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	div.title {
 		align-content: center;
 		max-width: 100% !important;
 	}
-
-	div.grid-container {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1000px) {
 	div.grid-container {
-		margin-left: 25% !important;
-		max-width: 75% !important;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
-
-	div.title {
-		align-content: center;
-		margin-left: 25% !important;
-		max-width: 75% !important;
-	}
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1250px) {
 	div.grid-container {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }
 
-@media (min-width: 1664px) {
+@media (min-width: 1500px) {
 	div.grid-container {
 		grid-template-columns: repeat(5, minmax(0, 1fr));
 	}
 }
 
-@media (min-width: 2048px) {
+@media (min-width: 1750px) {
 	div.grid-container {
 		grid-template-columns: repeat(6, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 2000px) {
+	div.grid-container {
+		grid-template-columns: repeat(7, minmax(0, 1fr));
 	}
 }
 

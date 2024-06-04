@@ -54,11 +54,6 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
-/*app.UseCookiePolicy(new CookiePolicyOptions() { Secure = CookieSecurePolicy.Always, OnAppendCookie = context =>
-					{
-						//context.CookieOptions.IsEssential = true;
-						context.CookieOptions.MaxAge      = TimeSpan.FromDays(25);
-					}});*/
 app.UseCookiePolicy();
 
 app.UseHttpsRedirection();
