@@ -32,14 +32,16 @@
 <div class="history grid-container container flex flex-wrap">
 	@foreach (var bannerType in PullsController.BannerTypes)
 	{
+		var     hasPulls       = pullsData.TryGetValue(bannerType, out var data);
 		var bannerTypeName = bannerType.BannerTypeToString();
 
 		<div class="history-item grid-item w-full inline-flex flex-col">
 
 			<p class="bannerType">@bannerTypeName pulls</p>
+			<text>CurrentPity: @(data?.FirstOrDefault().CurrentPity.ToString() ?? "0")</text>
+			<br/><br/>
 
 			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName">Open</text>
-
 			<table style="display: none;" class="w-full" id="@bannerTypeName">
 				<thead>
 				<th>Name</th>
@@ -48,44 +50,21 @@
 				</thead>
 
 				<tbody>
-				@if (pullsData.TryGetValue(bannerType, out var data))
+				@if (hasPulls)
 				{
-					byte       legendaryPity = 1;
-					byte       epicPity      = 1;
-					const byte commonPity    = 1;
-
-					@foreach (var item in data)
+					@foreach (var item in data!)
 					{
-						byte pity;
-						var  color = "rarity ";
-
-						switch (item.Rarity)
-						{
-							case 5:
-								pity          =  legendaryPity;
-								color         += "legendary";
-								legendaryPity =  1;
-								epicPity++;
-								break;
-
-							case 4:
-								pity     =  epicPity;
-								color    += "epic";
-								epicPity =  1;
-								legendaryPity++;
-								break;
-
-							default:
-								pity  =  commonPity;
-								color += "common";
-								legendaryPity++;
-								epicPity++;
-								break;
-						}
+						var color = "rarity "
+									+ item.Rarity switch
+									{
+										5 => "legendary",
+										4 => "epic",
+										_ => "common"
+									};
 
 						<tr class="@color">
 							<th>@item.Name</th>
-							<th>@pity.ToString()</th>
+							<th>@item.Pity.ToString()</th>
 							<th>@item.Time.ToString(CultureInfo.CurrentCulture)</th>
 						</tr>
 					}

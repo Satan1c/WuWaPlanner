@@ -20,6 +20,12 @@ public struct PullData
 
 	[JsonProperty("resourceType")]
 	public DropTypeEnum DropType;
+
+	[JsonProperty("pity")]
+	public byte Pity;
+
+	[JsonProperty("currentPity")]
+	public byte CurrentPity;
 }
 
 public enum DropTypeEnum : byte

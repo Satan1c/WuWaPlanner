@@ -5,6 +5,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using WuWaPlanner.Extensions;
 using WuWaPlanner.Models;
 using File = Google.Apis.Drive.v3.Data.File;
 
@@ -104,16 +105,16 @@ public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthPr
 		var vals = tasks.Values.ToArray();
 		await Task.WhenAll(vals);
 
-		var select = tasks.Select(
-								  x => new KeyValuePair<BannerType, PullData[]>(
-																				x.Key,
-																				JsonConvert.DeserializeObject<PullDataDto>(x.Value.Result)!
-																						   .Data.Reverse()
-																						   .ToArray()
-																			   )
-								 );
+		var pairs = tasks.Select(
+								 x =>
+								 {
+									 var pulls  = JsonConvert.DeserializeObject<PullDataDto>(x.Value.Result)!.Data;
+									 var result = pulls.Reverse().CalculatePity().Reverse().ToArray();
+									 return new KeyValuePair<BannerType, PullData[]>(x.Key, result);
+								 }
+								);
 
-		return new Dictionary<BannerType, PullData[]>(select);
+		return new Dictionary<BannerType, PullData[]>(pairs);
 	}
 
 	private async Task<string> DoRequest(BannerType bannerType)
