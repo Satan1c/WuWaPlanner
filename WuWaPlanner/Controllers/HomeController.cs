@@ -5,22 +5,18 @@ using WuWaPlanner.Models;
 
 namespace WuWaPlanner.Controllers;
 
+[Route("/")]
 public class HomeController(IGoogleAuthProvider authProvider) : Controller
 {
 	private readonly IGoogleAuthProvider m_authProvider = authProvider;
 
-	[Route("")]
+	[Route("/")]
 	public IActionResult Home() => View();
 
-	public IActionResult Pulls() => RedirectToAction("Pulls", "Pulls");
-
-	[Route("/signin-oidc")]
-	[HttpGet("/signin-oidc")]
 	[HttpPost("/signin-oidc")]
-	public IActionResult Login() => RedirectToAction("Settings", "Settings");
+	public IActionResult Signin() => RedirectToAction("Settings", "Settings");
 
-	public IActionResult Settings() => RedirectToAction("Settings", "Settings");
-
+	[Route("/error")]
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 	public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 }

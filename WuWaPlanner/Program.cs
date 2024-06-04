@@ -30,6 +30,11 @@ builder.Services.AddAuthentication(
 
 																					 await Task.FromResult(0);
 																				 };
+
+								   options.GetClaimsFromUserInfoEndpoint = true;
+								   options.SaveTokens                    = true;
+
+								   //options.Validate();
 							   }
 							  );
 
@@ -44,6 +49,9 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
+//app.UseCookiePolicy(new CookiePolicyOptions() { Secure = CookieSecurePolicy.Always, MinimumSameSitePolicy = SameSiteMode.Lax });
+app.UseCookiePolicy();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -55,6 +63,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapControllerRoute("default", "{controller=Home}/{action=Home}/{id?}");
+app.MapControllerRoute("default",     "{controller=Home}/{action=Home}/{id?}");
+app.MapControllerRoute("signin-oidc", "{controller=Home}/{action=Signin}");
 
 app.Run($"{Environment.GetEnvironmentVariable("HOST")}:{Environment.GetEnvironmentVariable("PORT")}");
