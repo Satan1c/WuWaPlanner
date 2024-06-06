@@ -12,13 +12,11 @@ using File = Google.Apis.Drive.v3.Data.File;
 namespace WuWaPlanner.Controllers;
 
 [Route("settings")]
-[Authorize]
 public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 {
 	private readonly IGoogleAuthProvider m_authProvider = authProvider;
 
 	[Route("")]
-	[AllowAnonymous]
 	public IActionResult Settings()
 	{
 		var user = new SettingsViewModel { IsAuthorized = User.Identity?.IsAuthenticated ?? false };
@@ -27,7 +25,6 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 	}
 
 	[Route("login")]
-	[AllowAnonymous]
 	[GoogleScopedAuthorize(DriveService.ScopeConstants.DriveAppdata, DriveService.ScopeConstants.DriveFile)]
 	public async ValueTask<IActionResult> GoogleLogin()
 	{
@@ -65,6 +62,7 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 	}
 
 	[Route("logout")]
+	[Authorize]
 	public async ValueTask<IActionResult> Logout()
 	{
 		HttpContext.Session.Clear();
