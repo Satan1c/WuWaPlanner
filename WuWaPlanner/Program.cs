@@ -18,9 +18,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.ConfigureApplicationCookie(
 											options =>
 											{
-												options.Cookie.HttpOnly   = true;
-												options.ExpireTimeSpan    = TimeSpan.FromDays(25);
-												options.SlidingExpiration = true;
+												options.Cookie.HttpOnly     = true;
+												options.ExpireTimeSpan      = TimeSpan.FromDays(25);
+												options.SlidingExpiration   = true;
+												options.Cookie.SameSite     = SameSiteMode.None;
+												options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 											}
 										   );
 
@@ -41,6 +43,8 @@ builder.Services.AddAuthentication(
 					  options.Cookie.MaxAge       = TimeSpan.FromDays(25);
 					  options.Cookie.SameSite     = SameSiteMode.None;
 					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+					  options.Cookie.HttpOnly     = true;
+					  options.SlidingExpiration   = true;
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
