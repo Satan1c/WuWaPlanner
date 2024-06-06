@@ -1,4 +1,5 @@
 using Google.Apis.Auth.AspNetCore3;
+using Google.Apis.Drive.v3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,11 +18,12 @@ builder.Services.AddAuthentication(
 	   .AddCookie(
 				  options =>
 				  {
+					  options.LoginPath           = "/settings/login";
+					  options.LoginPath           = "/settings/logout";
 					  options.ExpireTimeSpan      = TimeSpan.FromDays(25);
-					  options.Cookie.MaxAge       = options.ExpireTimeSpan;
-					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+					  options.Cookie.MaxAge       = TimeSpan.FromDays(25);
 					  options.Cookie.SameSite     = SameSiteMode.None;
-					  options.SlidingExpiration   = true;
+					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
@@ -40,8 +42,18 @@ builder.Services.AddAuthentication(
 																					 await Task.FromResult(0);
 																				 };
 
-								   options.MaxAge     = TimeSpan.FromDays(1);
-								   options.SaveTokens = true;
+								   options.MaxAge = TimeSpan.FromDays(1);
+								   options.Scope.Add(DriveService.ScopeConstants.DriveAppdata);
+								   options.Scope.Add(DriveService.ScopeConstants.DriveFile);
+								   options.SaveTokens                     = true;
+								   options.NonceCookie.MaxAge             = TimeSpan.FromDays(25);
+								   options.NonceCookie.Expiration         = TimeSpan.FromDays(25);
+								   options.NonceCookie.SecurePolicy       = CookieSecurePolicy.Always;
+								   options.NonceCookie.SameSite           = SameSiteMode.None;
+								   options.CorrelationCookie.MaxAge       = TimeSpan.FromDays(25);
+								   options.CorrelationCookie.Expiration   = TimeSpan.FromDays(25);
+								   options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+								   options.CorrelationCookie.SameSite     = SameSiteMode.None;
 							   }
 							  );
 

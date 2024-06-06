@@ -12,7 +12,7 @@ using File = Google.Apis.Drive.v3.Data.File;
 namespace WuWaPlanner.Controllers;
 
 [Route("pulls")]
-public class PullsController(IHttpClientFactory httpClientFactory, IGoogleAuthProvider authProvider) : Controller
+public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactory httpClientFactory) : Controller
 {
 	public static readonly BannerType[] BannerTypes =
 	[

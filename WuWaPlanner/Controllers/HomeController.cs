@@ -1,20 +1,18 @@
 using System.Diagnostics;
-using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Mvc;
 using WuWaPlanner.Models;
 
 namespace WuWaPlanner.Controllers;
 
 [Route("/")]
-public class HomeController(IGoogleAuthProvider authProvider) : Controller
+public class HomeController : Controller
 {
-	private readonly IGoogleAuthProvider m_authProvider = authProvider;
-
 	[Route("/")]
 	public IActionResult Home() => View();
 
 	[HttpPost("/signin-oidc")]
-	public IActionResult Signin() => RedirectToAction("Settings", "Settings");
+	[HttpPost("/signin-google")]
+	public IActionResult Signin() => RedirectToAction("GoogleResponse", "Settings");
 
 	[Route("/error")]
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

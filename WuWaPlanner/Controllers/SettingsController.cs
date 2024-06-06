@@ -3,6 +3,9 @@ using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WuWaPlanner.Models;
@@ -21,6 +24,33 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 		var user = new SettingsViewModel { IsAuthorized = User.Identity?.IsAuthenticated ?? false };
 
 		return View(user);
+	}
+
+	[Route("google-login")]
+	public IActionResult NewGoogleLogin()
+	{
+		var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
+		return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+	}
+
+	[Route("google-response")]
+	[Route("signin-google")]
+	public async ValueTask<IActionResult> GoogleResponse()
+	{
+		var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+		var claims = result.Principal?.Identities.FirstOrDefault()
+						   ?.Claims.Select(
+										   claim => new
+										   {
+											   claim.Issuer,
+											   claim.OriginalIssuer,
+											   claim.Type,
+											   claim.Value
+										   }
+										  );
+
+		return Json(claims);
 	}
 
 	[Route("login")]
@@ -61,6 +91,7 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 	}
 
 	[Route("logout")]
+	[Authorize]
 	public async ValueTask<IActionResult> Logout()
 	{
 		HttpContext.Session.Clear();
