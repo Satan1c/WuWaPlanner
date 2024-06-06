@@ -3,6 +3,7 @@ using System.Text;
 using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WuWaPlanner.Extensions;
@@ -12,6 +13,7 @@ using File = Google.Apis.Drive.v3.Data.File;
 namespace WuWaPlanner.Controllers;
 
 [Route("pulls")]
+[Authorize]
 public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactory httpClientFactory) : Controller
 {
 	public static readonly BannerType[] BannerTypes =
@@ -25,6 +27,7 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 	private readonly        IHttpClientFactory                 m_httpClientFactory = httpClientFactory;
 
 	[Route("")]
+	[AllowAnonymous]
 	public async ValueTask<IActionResult> Pulls()
 	{
 		var existed = HttpContext.Session.GetString(nameof(PullDataDto));
@@ -121,7 +124,7 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 	{
 		var tokensRaw = HttpContext.Session.GetString("tokens");
 
-		if (tokensRaw is null || tokensRaw == string.Empty) return string.Empty;
+		if (tokensRaw is null or "") return string.Empty;
 
 		var tokens   = tokensRaw.Split(',');
 		var userId   = tokens[0];
