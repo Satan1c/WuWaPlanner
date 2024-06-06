@@ -3,6 +3,7 @@ using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,6 +18,7 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 	private readonly IGoogleAuthProvider m_authProvider = authProvider;
 
 	[Route("")]
+	[Authorize]
 	public IActionResult Settings()
 	{
 		var user = new SettingsViewModel { IsAuthorized = User.Identity?.IsAuthenticated ?? false };
@@ -66,7 +68,7 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 	public async ValueTask<IActionResult> Logout()
 	{
 		HttpContext.Session.Clear();
-		await HttpContext.SignOutAsync();
+		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
 		return RedirectToAction("Settings");
 	}

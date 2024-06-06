@@ -1,5 +1,4 @@
 using Google.Apis.Auth.AspNetCore3;
-using Google.Apis.Drive.v3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +14,43 @@ builder.Services.AddSession(
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.ConfigureApplicationCookie(
+builder.Services.AddAuthentication(
+								   o =>
+								   {
+									   // This forces challenge results to be handled by Google OpenID Handler, so there's no
+									   // need to add an AccountController that emits challenges for Login.
+									   o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+
+									   // This forces forbid results to be handled by Google OpenID Handler, which checks if
+									   // extra scopes are required and does automatic incremental auth.
+									   o.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+
+									   // Default scheme that will handle everything else.
+									   // Once a user is authenticated, the OAuth2 token info is stored in cookies.
+									   o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+								   }
+								  )
+	   .AddCookie(
+				  options =>
+				  {
+					  options.Cookie.MaxAge      = TimeSpan.FromDays(25);
+					  options.Cookie.MaxAge      = TimeSpan.FromDays(25);
+					  options.Cookie.HttpOnly    = true;
+					  options.Cookie.IsEssential = true;
+				  }
+				 )
+	   .AddGoogleOpenIdConnect(
+							   options =>
+							   {
+								   options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId");
+								   options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret");
+								   options.SaveTokens   = true;
+							   }
+							  );
+
+;
+
+/*builder.Services.ConfigureApplicationCookie(
 											options =>
 											{
 												options.Cookie.HttpOnly     = true;
@@ -24,9 +59,9 @@ builder.Services.ConfigureApplicationCookie(
 												options.Cookie.SameSite     = SameSiteMode.None;
 												options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 											}
-										   );
+										   );*/
 
-builder.Services.AddAuthentication(
+/*builder.Services.AddAuthentication(
 								   o =>
 								   {
 									   o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
@@ -45,18 +80,6 @@ builder.Services.AddAuthentication(
 					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 					  options.Cookie.HttpOnly     = true;
 					  options.SlidingExpiration   = true;
-				  }
-				 )
-	   .AddGoogle(
-				  options =>
-				  {
-					  options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId")!;
-					  options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret")!;
-					  options.CallbackPath = "/signin-oidc";
-					  options.SaveTokens   = true;
-
-					  options.Scope.Add(DriveService.ScopeConstants.DriveAppdata);
-					  options.Scope.Add(DriveService.ScopeConstants.DriveFile);
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
@@ -83,9 +106,8 @@ builder.Services.AddAuthentication(
 								   options.Scope.Add(DriveService.ScopeConstants.DriveAppdata);
 								   options.Scope.Add(DriveService.ScopeConstants.DriveFile);
 							   }
-							  );
+							  );*/
 
-builder.Services.AddMvc();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -95,8 +117,6 @@ if (!app.Environment.IsDevelopment())
 	app.UseExceptionHandler("/error");
 	app.UseHsts();
 }
-
-app.UseCookiePolicy();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
