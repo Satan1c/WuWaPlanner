@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(
 							   {
 								   options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId");
 								   options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret");
-								   options.SaveTokens   = true;
+								   options.SaveTokens   = false;
 
 								   options.Events.OnRedirectToIdentityProvider = async context =>
 																				 {
