@@ -47,6 +47,18 @@ builder.Services.AddAuthentication(
 					  options.SlidingExpiration   = true;
 				  }
 				 )
+	   .AddGoogle(
+				  options =>
+				  {
+					  options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId")!;
+					  options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret")!;
+					  options.CallbackPath = "/signin-oidc";
+					  options.SaveTokens   = true;
+
+					  options.Scope.Add(DriveService.ScopeConstants.DriveAppdata);
+					  options.Scope.Add(DriveService.ScopeConstants.DriveFile);
+				  }
+				 )
 	   .AddGoogleOpenIdConnect(
 							   options =>
 							   {
