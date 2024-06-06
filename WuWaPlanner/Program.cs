@@ -31,6 +31,8 @@ builder.Services.AddAuthentication(
 							   {
 								   options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId");
 								   options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret");
+								   options.Authority    = "https://accounts.google.com";
+								   options.CallbackPath = "/signin-google";
 
 								   options.Events.OnRedirectToIdentityProvider = async context =>
 																				 {

@@ -12,7 +12,7 @@ public class HomeController : Controller
 
 	[HttpPost("/signin-oidc")]
 	[HttpPost("/signin-google")]
-	public IActionResult Signin() => RedirectToAction("GoogleResponse", "Settings");
+	public IActionResult Signin() => RedirectToAction("GoogleLogin", "Settings");
 
 	[Route("/error")]
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
