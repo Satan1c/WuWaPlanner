@@ -12,6 +12,8 @@ public class HomeController : Controller
 	{
 		Console.WriteLine(User.Identity?.IsAuthenticated.ToString());
 
+		var ctx = HttpContext;
+
 		foreach (var i in User.Claims)
 		{
 			Console.WriteLine(i.OriginalIssuer);
