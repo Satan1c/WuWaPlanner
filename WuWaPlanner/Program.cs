@@ -45,6 +45,16 @@ builder.Services.AddAuthentication(
 								   options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId");
 								   options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret");
 								   options.SaveTokens   = true;
+
+								   options.Events.OnRedirectToIdentityProvider = async context =>
+																				 {
+																					 context.ProtocolMessage.RedirectUri
+																							 = context.ProtocolMessage.RedirectUri.Replace(
+																								  "http://", "https://"
+																								 );
+
+																					 await Task.FromResult(0);
+																				 };
 							   }
 							  );
 
