@@ -19,7 +19,7 @@ public static class PullsExtensions
 				case 5:
 					pull.Pity     = legendaryPity;
 					legendaryPity = 1;
-					epicPity++;
+					epicPity      = 1;
 					break;
 
 				case 4:
