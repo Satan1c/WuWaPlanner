@@ -1,7 +1,23 @@
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using StackExchange.Redis;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder  = WebApplication.CreateBuilder(args);
+var rediscfg = Environment.GetEnvironmentVariable("RedisConfig")!.Split(',');
+
+var redis = await ConnectionMultiplexer.ConnectAsync(
+													 rediscfg[0], options =>
+																  {
+																	  options.User     = rediscfg[1];
+																	  options.Password = rediscfg[2];
+																  }
+													);
+
+builder.Services.AddDataProtection()
+	   .SetApplicationName("WuWaPlanner")
+	   .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
+	   .DisableAutomaticKeyGeneration();
 
 builder.Services.AddSession(
 							options =>

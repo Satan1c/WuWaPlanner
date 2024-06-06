@@ -12,7 +12,7 @@ public class HomeController : Controller
 	{
 		Console.WriteLine(User.Identity?.IsAuthenticated.ToString());
 
-		var ctx = HttpContext;
+		/*var ctx = HttpContext;
 
 		foreach (var i in User.Claims)
 		{
@@ -20,7 +20,7 @@ public class HomeController : Controller
 			Console.WriteLine(i.Issuer);
 			Console.WriteLine(i.Value);
 			Console.WriteLine();
-		}
+		}*/
 
 		return View();
 	}

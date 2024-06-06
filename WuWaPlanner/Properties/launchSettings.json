@@ -15,8 +15,7 @@
 	  "launchBrowser": true,
 	  "applicationUrl": "http://localhost",
 	  "environmentVariables": {
-		"ASPNETCORE_ENVIRONMENT": "Development",
-		"RedisConfig": "1:localhost:6379"
+		"ASPNETCORE_ENVIRONMENT": "Development"
 	  }
 	},
 	"https": {
@@ -26,7 +25,8 @@
 	  "applicationUrl": "https://localhost;http://localhost",
 	  "environmentVariables": {
 		"ASPNETCORE_ENVIRONMENT": "Development",
-		"HOST": "https://0.0.0.0"
+		"HOST": "https://0.0.0.0",
+		"RedisConfig": "localhost:6379,,1"
 	  }
 	},
 	"IIS Express": {
