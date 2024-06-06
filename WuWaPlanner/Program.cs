@@ -4,8 +4,25 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSession();
+builder.Services.AddSession(
+							options =>
+							{
+								options.IdleTimeout        = TimeSpan.FromDays(7);
+								options.Cookie.HttpOnly    = true;
+								options.Cookie.IsEssential = true;
+							}
+						   );
+
 builder.Services.AddControllersWithViews();
+
+builder.Services.ConfigureApplicationCookie(
+											options =>
+											{
+												options.Cookie.HttpOnly   = true;
+												options.ExpireTimeSpan    = TimeSpan.FromDays(25);
+												options.SlidingExpiration = true;
+											}
+										   );
 
 builder.Services.AddAuthentication(
 								   o =>
@@ -29,10 +46,13 @@ builder.Services.AddAuthentication(
 	   .AddGoogleOpenIdConnect(
 							   options =>
 							   {
-								   options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId");
-								   options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret");
-								   options.Authority    = "https://accounts.google.com";
-								   options.CallbackPath = "/signin-google";
+								   options.ClientId                      = Environment.GetEnvironmentVariable("GoogleClientId");
+								   options.ClientSecret                  = Environment.GetEnvironmentVariable("GoogleClientSecret");
+								   options.Authority                     = "https://accounts.google.com";
+								   options.CallbackPath                  = "/signin-oidc";
+								   options.SaveTokens                    = true;
+								   options.UseTokenLifetime              = false;
+								   options.GetClaimsFromUserInfoEndpoint = true;
 
 								   options.Events.OnRedirectToIdentityProvider = async context =>
 																				 {
@@ -44,18 +64,8 @@ builder.Services.AddAuthentication(
 																					 await Task.FromResult(0);
 																				 };
 
-								   options.MaxAge = TimeSpan.FromDays(1);
 								   options.Scope.Add(DriveService.ScopeConstants.DriveAppdata);
 								   options.Scope.Add(DriveService.ScopeConstants.DriveFile);
-								   options.SaveTokens                     = true;
-								   options.NonceCookie.MaxAge             = TimeSpan.FromDays(25);
-								   options.NonceCookie.Expiration         = TimeSpan.FromDays(25);
-								   options.NonceCookie.SecurePolicy       = CookieSecurePolicy.Always;
-								   options.NonceCookie.SameSite           = SameSiteMode.None;
-								   options.CorrelationCookie.MaxAge       = TimeSpan.FromDays(25);
-								   options.CorrelationCookie.Expiration   = TimeSpan.FromDays(25);
-								   options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-								   options.CorrelationCookie.SameSite     = SameSiteMode.None;
 							   }
 							  );
 
