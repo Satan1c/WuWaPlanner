@@ -176,7 +176,7 @@ public class BannerData()
 		Pulls = pullsList.ToArray();
 		Total = Pulls.LongLength;
 		var legendaryIndex = pullsList.FindIndex(data => data.Rarity == 5);
-		var epicIndex      = pullsList.FindIndex(data => data.Rarity == 4);
+		var epicIndex      = pullsList.FindIndex(data => data.Rarity is 4 or 5);
 		LegendaryPity = (byte)Math.Max(0, legendaryIndex == -1 ? Total : legendaryIndex);
 		EpicPity      = (byte)Math.Max(0, epicIndex == -1 || Total < 11 ? Total : epicIndex);
 	}
