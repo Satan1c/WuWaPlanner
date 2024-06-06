@@ -33,10 +33,12 @@ builder.Services.AddAuthentication(
 	   .AddCookie(
 				  options =>
 				  {
-					  options.Cookie.MaxAge      = TimeSpan.FromDays(25);
-					  options.Cookie.MaxAge      = TimeSpan.FromDays(25);
-					  options.Cookie.HttpOnly    = true;
-					  options.Cookie.IsEssential = true;
+					  options.Cookie.MaxAge       = TimeSpan.FromDays(25);
+					  options.Cookie.MaxAge       = TimeSpan.FromDays(25);
+					  options.Cookie.HttpOnly     = true;
+					  options.Cookie.IsEssential  = true;
+					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+					  options.Cookie.SameSite     = SameSiteMode.None;
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
