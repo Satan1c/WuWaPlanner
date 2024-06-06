@@ -17,9 +17,11 @@ builder.Services.AddAuthentication(
 	   .AddCookie(
 				  options =>
 				  {
-					  options.ExpireTimeSpan    = TimeSpan.FromDays(25);
-					  options.Cookie.MaxAge     = options.ExpireTimeSpan;
-					  options.SlidingExpiration = true;
+					  options.ExpireTimeSpan      = TimeSpan.FromDays(25);
+					  options.Cookie.MaxAge       = options.ExpireTimeSpan;
+					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+					  options.Cookie.SameSite     = SameSiteMode.None;
+					  options.SlidingExpiration   = true;
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
