@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WuWaPlanner.Models;
 
@@ -9,10 +8,18 @@ namespace WuWaPlanner.Controllers;
 public class HomeController : Controller
 {
 	[Route("/")]
-	[Authorize]
 	public IActionResult Home()
 	{
 		Console.WriteLine(User.Identity?.IsAuthenticated.ToString());
+
+		foreach (var i in User.Claims)
+		{
+			Console.WriteLine(i.OriginalIssuer);
+			Console.WriteLine(i.Issuer);
+			Console.WriteLine(i.Value);
+			Console.WriteLine();
+		}
+
 		return View();
 	}
 

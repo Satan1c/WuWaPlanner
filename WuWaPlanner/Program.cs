@@ -39,17 +39,14 @@ builder.Services.AddAuthentication(
 					  options.Cookie.IsEssential  = true;
 					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 					  options.Cookie.SameSite     = SameSiteMode.None;
-					  options.Cookie.Domain       = ".satan1c.dev";
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
 							   options =>
 							   {
-								   options.ClientId                 = Environment.GetEnvironmentVariable("GoogleClientId");
-								   options.ClientSecret             = Environment.GetEnvironmentVariable("GoogleClientSecret");
-								   options.SaveTokens               = true;
-								   options.NonceCookie.Domain       = ".satan1c.dev";
-								   options.CorrelationCookie.Domain = ".satan1c.dev";
+								   options.ClientId     = Environment.GetEnvironmentVariable("GoogleClientId");
+								   options.ClientSecret = Environment.GetEnvironmentVariable("GoogleClientSecret");
+								   options.SaveTokens   = true;
 
 								   options.Events.OnRedirectToIdentityProvider = async context =>
 																				 {

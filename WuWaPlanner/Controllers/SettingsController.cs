@@ -1,14 +1,11 @@
-﻿using System.Text;
-using Google.Apis.Auth.AspNetCore3;
+﻿using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using WuWaPlanner.Models;
-using File = Google.Apis.Drive.v3.Data.File;
 
 namespace WuWaPlanner.Controllers;
 
@@ -38,7 +35,7 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 									  }
 									 );
 
-		var files = google.Files.List();
+		/*var files = google.Files.List();
 		files.Spaces   = "appDataFolder";
 		files.PageSize = 1;
 
@@ -59,7 +56,7 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 
 		using var data = new MemoryStream();
 		await google.Files.Get(file.Id).DownloadAsync(data);
-		HttpContext.Session.SetString(nameof(PullDataDto), Encoding.UTF8.GetString(data.GetBuffer()));
+		HttpContext.Session.SetString(nameof(PullDataDto), Encoding.UTF8.GetString(data.GetBuffer()));*/
 		return RedirectToAction("Settings");
 	}
 
