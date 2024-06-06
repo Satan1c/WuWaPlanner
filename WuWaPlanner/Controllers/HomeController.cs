@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WuWaPlanner.Models;
@@ -11,7 +13,13 @@ public class HomeController : Controller
 {
 	[Route("/")]
 	[AllowAnonymous]
-	public IActionResult Home() => View();
+	public async ValueTask<IActionResult> Home()
+	{
+		var auth = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+		Console.WriteLine(auth);
+		Console.WriteLine(auth.Succeeded);
+		return View();
+	}
 
 	[HttpPost("/signin-oidc")]
 	[HttpPost("/signin-google")]
