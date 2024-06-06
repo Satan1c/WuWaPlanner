@@ -63,10 +63,12 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 	}
 
 	[HttpGet("import")]
+	[AllowAnonymous]
 	public IActionResult PullsImport() => View();
 
 	[HttpPost("import")]
 	[AutoValidateAntiforgeryToken]
+	[AllowAnonymous]
 	public async ValueTask<IActionResult> PullsImport([FromForm] PullsDataForm dataForm)
 	{
 		if (!ModelState.IsValid) return View();
