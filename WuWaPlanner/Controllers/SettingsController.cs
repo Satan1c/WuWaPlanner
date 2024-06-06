@@ -40,8 +40,9 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 		files.PageSize = 1;
 
 		var appDataFolder = await files.ExecuteAsync().ConfigureAwait(false);
+		var file          = appDataFolder.Files.FirstOrDefault();
 
-		if (appDataFolder.Files.Count < 1)
+		if (file is null)
 		{
 			using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new Dictionary<string, string>())));
 
@@ -50,10 +51,11 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 						.ConfigureAwait(false);
 
 			appDataFolder = await files.ExecuteAsync().ConfigureAwait(false);
+			file          = appDataFolder.Files.First();
 		}
 
 		using var data = new MemoryStream();
-		await google.Files.Get(appDataFolder.Files.First().Id).DownloadAsync(data);
+		await google.Files.Get(file.Id).DownloadAsync(data);
 		HttpContext.Session.SetString(nameof(PullDataDto), Encoding.UTF8.GetString(data.GetBuffer()));
 		return RedirectToAction("Settings");
 	}
