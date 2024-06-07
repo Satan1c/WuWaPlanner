@@ -60,7 +60,15 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 	}
 
 	[HttpGet("import")]
-	public IActionResult PullsImport() => View();
+	public IActionResult PullsImport()
+		=> View(
+				new PullsDataForm
+				{
+					Tokens = User.Identity?.IsAuthenticated ?? false
+									 ? HttpContext.Session.GetString("tokens") ?? string.Empty
+									 : string.Empty
+				}
+			   );
 
 	[HttpPost("import")]
 	[AutoValidateAntiforgeryToken]

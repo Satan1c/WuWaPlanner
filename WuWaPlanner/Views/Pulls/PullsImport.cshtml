@@ -31,6 +31,7 @@
 		asp-for="Tokens"
 		type="text"
 		name="Tokens"
+		value="@Model.Tokens"
 		minlength="70" maxlength="80">
 	@Html.ValidationMessageFor(form => form.Tokens)
 	<button type="submit">Scan</button>
