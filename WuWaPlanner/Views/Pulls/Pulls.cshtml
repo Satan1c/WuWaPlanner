@@ -21,8 +21,7 @@
 	});
 
 	document.querySelectorAll('.toggleRarityButton').forEach(button => {
-		button.addEventListener('click', function (b) {
-			console.log(this.getAttribute('data-target'))
+		button.addEventListener('click', function () {
 			document.querySelectorAll(this.getAttribute('data-target')).forEach(pull => {
 				pull.style.display = pull.style.display === 'none' ? 'table-row' : 'none';
 			})

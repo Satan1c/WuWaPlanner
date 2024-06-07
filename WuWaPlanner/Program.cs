@@ -14,9 +14,10 @@ var redis = await ConnectionMultiplexer.ConnectAsync(
 																  }
 													);
 
-builder.Services.AddDataProtection().SetApplicationName("WuWaPlanner").PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
-
-//.DisableAutomaticKeyGeneration();
+builder.Services.AddDataProtection()
+	   .SetApplicationName("WuWaPlanner")
+	   .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
+	   .DisableAutomaticKeyGeneration();
 
 builder.Services.AddSession(
 							options =>
@@ -46,6 +47,7 @@ builder.Services.AddAuthentication(
 					  options.Cookie.IsEssential  = true;
 					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 					  options.Cookie.SameSite     = SameSiteMode.None;
+					  options.SlidingExpiration   = true;
 				  }
 				 )
 	   .AddGoogleOpenIdConnect(
