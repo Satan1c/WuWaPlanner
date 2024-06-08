@@ -14,7 +14,10 @@ var redis = await ConnectionMultiplexer.ConnectAsync(
 																  }
 													);
 
-builder.Services.AddDataProtection().SetApplicationName("WuWaPlanner").PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
+builder.Services.AddDataProtection()
+	   .SetApplicationName("WuWaPlanner")
+	   .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
+	   .DisableAutomaticKeyGeneration();
 
 builder.Services.AddSession(
 							options =>
