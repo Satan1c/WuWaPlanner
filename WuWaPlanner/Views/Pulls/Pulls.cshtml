@@ -37,7 +37,7 @@
 </div>
 
 <div class="history grid-container container flex flex-wrap">
-	@foreach (var bannerType in PullsController.BannerTypes)
+	@foreach (var bannerType in PullsController.BannerTypes.AsParallel())
 	{
 		var     hasPulls       = pullsData.TryGetValue(bannerType, out var data);
 		var bannerTypeName = bannerType.BannerTypeToString();

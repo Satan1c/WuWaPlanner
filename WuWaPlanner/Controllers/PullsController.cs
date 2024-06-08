@@ -39,6 +39,7 @@ public class PullsController(
 	private readonly        IHttpClientFactory      m_httpClientFactory = httpClientFactory;
 
 	[Route("")]
+	[ResponseCache(Duration = 3888000, Location = ResponseCacheLocation.Client)]
 	public async ValueTask<IActionResult> Pulls()
 	{
 		var existed = HttpContext.Request.Cookies.TryGetValue("tokens", out var tokens) ? m_cacheManager.Get(tokens) : null;
@@ -74,6 +75,7 @@ public class PullsController(
 	}
 
 	[HttpGet("import")]
+	[ResponseCache(Duration = 604800, Location = ResponseCacheLocation.Client)]
 	public async ValueTask<IActionResult> PullsImport()
 	{
 		var tokens = HttpContext.Request.Cookies.TryGetValue("tokens", out var value) ? value : null;
@@ -110,6 +112,7 @@ public class PullsController(
 			await service.Files.Update(file, existed.Id, stream, "application/json").UploadAsync();
 		}
 
+		HttpContext.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
 		return RedirectToAction("Pulls");
 	}
 
