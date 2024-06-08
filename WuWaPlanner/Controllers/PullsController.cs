@@ -6,6 +6,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using WuWaPlanner.Extensions;
 using WuWaPlanner.Models;
 using File = Google.Apis.Drive.v3.Data.File;
@@ -15,6 +16,12 @@ namespace WuWaPlanner.Controllers;
 [Route("pulls")]
 public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactory httpClientFactory) : Controller
 {
+	private static readonly JsonSerializerSettings s_jsonSettings = new()
+	{
+		Formatting       = Formatting.None,
+		ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
+	};
+
 	public static readonly BannerType[] BannerTypes =
 	[
 		BannerType.EventCharacter, BannerType.EventWeapon, BannerType.StandardCharacter, BannerType.StandardWeapon,
@@ -55,7 +62,9 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 			}
 		}
 
-		var result = existed is null ? s_emptyDictionary : JsonConvert.DeserializeObject<Dictionary<BannerType, BannerData>>(existed)!;
+		var result = existed is null
+							 ? s_emptyDictionary
+							 : JsonConvert.DeserializeObject<Dictionary<BannerType, BannerData>>(existed, s_jsonSettings)!;
 
 		return View(new PullsViewModel { Data = result });
 	}
@@ -120,7 +129,12 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 									BannerTypes, async (bannerType, token) =>
 												 {
 													 //var data = await JsonSerializer.DeserializeAsync<PullDataDto>(await DoRequest(bannerType), cancellationToken: token);
-													 var data = JsonConvert.DeserializeObject<PullDataDto>(await DoRequest(bannerType));
+													 using var sr = new StreamReader(await DoRequest(bannerType).ConfigureAwait(false));
+													 await using JsonReader reader = new JsonTextReader(sr);
+
+													 var data = JsonSerializer.CreateDefault(s_jsonSettings)
+																			  .Deserialize<PullDataDto>(reader);
+
 													 results[bannerType] = new BannerData(data!.Data);
 												 }
 								   );
@@ -137,11 +151,11 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 		return results;
 	}
 
-	private async Task<string> DoRequest(BannerType bannerType)
+	private async ValueTask<Stream> DoRequest(BannerType bannerType)
 	{
 		var tokensRaw = HttpContext.Session.GetString("tokens");
 
-		if (tokensRaw is null or "") return string.Empty;
+		if (tokensRaw is null or "") return await new StringContent(string.Empty).ReadAsStreamAsync().ConfigureAwait(false);
 
 		var tokens   = tokensRaw.Split(',');
 		var userId   = tokens[0];
@@ -161,12 +175,15 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 
 		var resp = await client.PostAsync(
 										  "https://gmserver-api.aki-game2.net/gacha/record/query",
-										  new StringContent(JsonConvert.SerializeObject(request), Encoding.ASCII, "application/json")
+										  new StringContent(
+															JsonConvert.SerializeObject(request, s_jsonSettings), Encoding.ASCII,
+															"application/json"
+														   )
 										 )
 							   .ConfigureAwait(false);
 
 		resp.EnsureSuccessStatusCode();
-		return await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+		return await resp.Content.ReadAsStreamAsync().ConfigureAwait(false);
 	}
 }
 
