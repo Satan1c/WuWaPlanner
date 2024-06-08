@@ -8,7 +8,6 @@ namespace WuWaPlanner.Controllers;
 public class HomeController : Controller
 {
 	[Route("/")]
-	[ResponseCache(Duration = 3888000, Location = ResponseCacheLocation.Client)]
 	public IActionResult Home() => View();
 
 	[HttpPost("/signin-oidc")]

@@ -33,6 +33,8 @@ var cache = CacheFactory.Build<SaveData>(
 															 .DisableStatistics()
 										);
 
+builder.Services.AddResponseCaching();
+
 builder.Services.AddDataProtection()
 	   .SetApplicationName("WuWaPlanner")
 	   .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
@@ -110,6 +112,7 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
+app.UseResponseCaching();
 app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseStaticFiles();

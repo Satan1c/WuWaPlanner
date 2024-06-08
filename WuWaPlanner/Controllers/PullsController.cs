@@ -75,7 +75,6 @@ public class PullsController(
 	}
 
 	[HttpGet("import")]
-	[ResponseCache(Duration = 604800, Location = ResponseCacheLocation.Client)]
 	public async ValueTask<IActionResult> PullsImport()
 	{
 		var tokens = HttpContext.Request.Cookies.TryGetValue("tokens", out var value) ? value : null;

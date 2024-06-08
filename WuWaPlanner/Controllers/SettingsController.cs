@@ -27,7 +27,6 @@ public class SettingsController(IGoogleAuthProvider authProvider, ICacheManager<
 	private readonly ICacheManager<SaveData> m_cacheManager = cacheManager;
 
 	[Route("")]
-	[ResponseCache(Duration = 604800, Location = ResponseCacheLocation.Client)]
 	public IActionResult Settings()
 	{
 		var user = new SettingsViewModel { IsAuthorized = User.Identity?.IsAuthenticated ?? false };
@@ -88,7 +87,6 @@ public class SettingsController(IGoogleAuthProvider authProvider, ICacheManager<
 		}
 
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-		HttpContext.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
 		return RedirectToAction("Settings");
 	}
 }
