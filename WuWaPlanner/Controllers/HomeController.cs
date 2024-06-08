@@ -8,22 +8,7 @@ namespace WuWaPlanner.Controllers;
 public class HomeController : Controller
 {
 	[Route("/")]
-	public IActionResult Home()
-	{
-		Console.WriteLine(User.Identity?.IsAuthenticated.ToString());
-
-		/*var ctx = HttpContext;
-
-		foreach (var i in User.Claims)
-		{
-			Console.WriteLine(i.OriginalIssuer);
-			Console.WriteLine(i.Issuer);
-			Console.WriteLine(i.Value);
-			Console.WriteLine();
-		}*/
-
-		return View();
-	}
+	public IActionResult Home() => View();
 
 	[HttpPost("/signin-oidc")]
 	public IActionResult Signin() => RedirectToAction("GoogleLogin", "Settings");

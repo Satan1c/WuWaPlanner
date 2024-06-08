@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CacheManager.Core;
 using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
@@ -7,15 +8,23 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using WuWaPlanner.Models;
 using File = Google.Apis.Drive.v3.Data.File;
 
 namespace WuWaPlanner.Controllers;
 
 [Route("settings")]
-public class SettingsController(IGoogleAuthProvider authProvider) : Controller
+public class SettingsController(IGoogleAuthProvider authProvider, ICacheManager<SaveData> cacheManager) : Controller
 {
-	private readonly IGoogleAuthProvider m_authProvider = authProvider;
+	private static readonly JsonSerializerSettings s_jsonSettings = new()
+	{
+		Formatting       = Formatting.None,
+		ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
+	};
+
+	private readonly IGoogleAuthProvider     m_authProvider = authProvider;
+	private readonly ICacheManager<SaveData> m_cacheManager = cacheManager;
 
 	[Route("")]
 	public IActionResult Settings()
@@ -56,9 +65,12 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 			file          = appDataFolder.Files.First();
 		}
 
-		using var data = new MemoryStream();
-		await google.Files.Get(file.Id).DownloadAsync(data);
-		HttpContext.Session.SetString(nameof(PullDataDto), Encoding.UTF8.GetString(data.GetBuffer()));
+		using var download = new MemoryStream();
+		await google.Files.Get(file.Id).DownloadAsync(download);
+		var encoded = Encoding.UTF8.GetString(download.GetBuffer());
+		var data    = JsonConvert.DeserializeObject<SaveData>(encoded, s_jsonSettings)!;
+		m_cacheManager.AddOrUpdate(data.Tokens, data, _ => data);
+		HttpContext.Response.Cookies.Append("tokens", data.Tokens);
 		return RedirectToAction("Settings");
 	}
 
@@ -67,6 +79,13 @@ public class SettingsController(IGoogleAuthProvider authProvider) : Controller
 	public async ValueTask<IActionResult> Logout()
 	{
 		HttpContext.Session.Clear();
+
+		if (HttpContext.Request.Cookies.TryGetValue("tokens", out var tokens))
+		{
+			m_cacheManager.Remove(tokens);
+			HttpContext.Response.Cookies.Delete("tokens");
+		}
+
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
 		return RedirectToAction("Settings");

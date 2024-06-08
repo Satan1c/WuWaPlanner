@@ -1,7 +1,11 @@
+using System.IO.Compression;
+using CacheManager.Core;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.ResponseCompression;
 using StackExchange.Redis;
+using WuWaPlanner.Controllers;
 
 var builder  = WebApplication.CreateBuilder(args);
 var rediscfg = Environment.GetEnvironmentVariable("RedisConfig")!.Split(',');
@@ -13,6 +17,21 @@ var redis = await ConnectionMultiplexer.ConnectAsync(
 																	  options.Password = rediscfg[2];
 																  }
 													);
+
+var cache = CacheFactory.Build<SaveData>(
+										 nameof(PullDataDto),
+										 settings => settings.WithJsonSerializer()
+															 .WithRedisConfiguration("redis", redis)
+															 .WithSystemRuntimeCacheHandle("system")
+															 .WithExpiration(ExpirationMode.Sliding, TimeSpan.FromDays(45))
+															 .DisablePerformanceCounters()
+															 .DisableStatistics()
+															 .And.WithRedisBackplane("redis")
+															 .WithRedisCacheHandle("redis")
+															 .WithExpiration(ExpirationMode.Sliding, TimeSpan.FromDays(45))
+															 .DisablePerformanceCounters()
+															 .DisableStatistics()
+										);
 
 builder.Services.AddDataProtection()
 	   .SetApplicationName("WuWaPlanner")
@@ -28,6 +47,18 @@ builder.Services.AddSession(
 							}
 						   );
 
+builder.Services.AddSingleton(cache);
+
+builder.Services.AddResponseCompression(
+										options =>
+										{
+											options.EnableForHttps = true;
+											options.Providers.Add<BrotliCompressionProvider>();
+										}
+									   );
+
+builder.Services.Configure<BrotliCompressionProviderOptions>(options => { options.Level = CompressionLevel.SmallestSize; });
+
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 
 builder.Services.AddAuthentication(
@@ -41,8 +72,8 @@ builder.Services.AddAuthentication(
 	   .AddCookie(
 				  options =>
 				  {
-					  options.Cookie.MaxAge       = TimeSpan.FromDays(25);
-					  options.Cookie.MaxAge       = TimeSpan.FromDays(25);
+					  options.Cookie.MaxAge       = TimeSpan.FromDays(45);
+					  options.Cookie.MaxAge       = TimeSpan.FromDays(45);
 					  options.Cookie.HttpOnly     = true;
 					  options.Cookie.IsEssential  = true;
 					  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -79,6 +110,7 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
+app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

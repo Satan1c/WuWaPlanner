@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Text;
+using CacheManager.Core;
 using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
@@ -14,7 +15,11 @@ using File = Google.Apis.Drive.v3.Data.File;
 namespace WuWaPlanner.Controllers;
 
 [Route("pulls")]
-public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactory httpClientFactory) : Controller
+public class PullsController(
+		IGoogleAuthProvider     authProvider,
+		IHttpClientFactory      httpClientFactory,
+		ICacheManager<SaveData> cacheManager
+) : Controller
 {
 	private static readonly JsonSerializerSettings s_jsonSettings = new()
 	{
@@ -28,14 +33,15 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 		BannerType.Beginner, BannerType.BeginnerSelector, BannerType.BeginnerGiftSelector
 	];
 
-	private static readonly Dictionary<BannerType, BannerData> s_emptyDictionary   = new();
-	private readonly        IGoogleAuthProvider                m_authProvider      = authProvider;
-	private readonly        IHttpClientFactory                 m_httpClientFactory = httpClientFactory;
+	private static readonly SaveData                s_emptyData         = new();
+	private readonly        IGoogleAuthProvider     m_authProvider      = authProvider;
+	private readonly        ICacheManager<SaveData> m_cacheManager      = cacheManager;
+	private readonly        IHttpClientFactory      m_httpClientFactory = httpClientFactory;
 
 	[Route("")]
 	public async ValueTask<IActionResult> Pulls()
 	{
-		var existed = HttpContext.Session.GetString(nameof(PullDataDto));
+		var existed = HttpContext.Request.Cookies.TryGetValue("tokens", out var tokens) ? m_cacheManager.Get(tokens) : null;
 
 		if (existed is null && (User.Identity?.IsAuthenticated ?? false))
 		{
@@ -57,28 +63,22 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 				using var data = new MemoryStream();
 				await google.Files.Get(appDataFolder.Files.First().Id).DownloadAsync(data);
 
-				existed = Encoding.UTF8.GetString(data.GetBuffer());
-				HttpContext.Session.SetString(nameof(PullDataDto), existed);
+				var encoded = Encoding.UTF8.GetString(data.GetBuffer());
+				existed = JsonConvert.DeserializeObject<SaveData>(encoded, s_jsonSettings)!;
+				HttpContext.Response.Cookies.Append("tokens", existed.Tokens);
+				m_cacheManager.AddOrUpdate(existed.Tokens, existed, _ => existed);
 			}
 		}
 
-		var result = existed is null
-							 ? s_emptyDictionary
-							 : JsonConvert.DeserializeObject<Dictionary<BannerType, BannerData>>(existed, s_jsonSettings)!;
-
-		return View(new PullsViewModel { Data = result });
+		return View(new PullsViewModel { Data = existed ?? s_emptyData });
 	}
 
 	[HttpGet("import")]
-	public IActionResult PullsImport()
-		=> View(
-				new PullsDataForm
-				{
-					Tokens = User.Identity?.IsAuthenticated ?? false
-									 ? HttpContext.Session.GetString("tokens") ?? string.Empty
-									 : string.Empty
-				}
-			   );
+	public async ValueTask<IActionResult> PullsImport()
+	{
+		var tokens = HttpContext.Request.Cookies.TryGetValue("tokens", out var value) ? value : null;
+		return View(new PullsDataForm { Tokens = User.Identity?.IsAuthenticated ?? false ? tokens ?? string.Empty : string.Empty });
+	}
 
 	[HttpPost("import")]
 	[AutoValidateAntiforgeryToken]
@@ -86,9 +86,8 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 	{
 		if (!ModelState.IsValid) return View();
 
-		HttpContext.Session.SetString("tokens", dataForm.Tokens);
-		var data = JsonConvert.SerializeObject(await GrabData().ConfigureAwait(false));
-		HttpContext.Session.SetString(nameof(PullDataDto), data);
+		var data = await GrabData(dataForm.Tokens).ConfigureAwait(false);
+		m_cacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
 
 		if (User.Identity?.IsAuthenticated ?? false)
 		{
@@ -107,57 +106,36 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 			var existed       = appDataFolder.Files.First();
 
 			var       file   = new File { Name = "WuWa_User.json" };
-			using var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
+			using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(data, s_jsonSettings)));
 			await service.Files.Update(file, existed.Id, stream, "application/json").UploadAsync();
 		}
 
 		return RedirectToAction("Pulls");
 	}
 
-	private async ValueTask<IReadOnlyDictionary<BannerType, BannerData>> GrabData()
+	private async ValueTask<SaveData> GrabData(string tokens)
 	{
-		/*var tasks = new Dictionary<BannerType, Task<string>>();
-
-		foreach (var i in BannerTypes) { tasks[i] = DoRequest(i); }
-
-		var vals = tasks.Values.ToArray();
-		await Task.WhenAll(vals);*/
-
 		var results = new ConcurrentDictionary<BannerType, BannerData>();
 
 		await Parallel.ForEachAsync(
-									BannerTypes, async (bannerType, token) =>
+									BannerTypes, async (bannerType, _) =>
 												 {
-													 //var data = await JsonSerializer.DeserializeAsync<PullDataDto>(await DoRequest(bannerType), cancellationToken: token);
-													 using var sr = new StreamReader(await DoRequest(bannerType).ConfigureAwait(false));
-													 await using JsonReader reader = new JsonTextReader(sr);
-
-													 var data = JsonSerializer.CreateDefault(s_jsonSettings)
-																			  .Deserialize<PullDataDto>(reader);
+													 var data = JsonConvert.DeserializeObject<PullDataDto>(
+														  await DoRequest(bannerType, tokens).ConfigureAwait(false), s_jsonSettings
+														 );
 
 													 results[bannerType] = new BannerData(data!.Data);
 												 }
 								   );
 
-		/*var pairs = tasks.Select(
-								 x =>
-								 {
-									 var pullsRaw = JsonConvert.DeserializeObject<PullDataDto>(x.Value.Result)!.Data;
-									 var result   = new BannerData(pullsRaw);
-									 return new KeyValuePair<BannerType, BannerData>(x.Key, result);
-								 }
-								);*/
-
-		return results;
+		return new SaveData { Tokens = tokens, Data = results.AsReadOnly() };
 	}
 
-	private async ValueTask<Stream> DoRequest(BannerType bannerType)
+	private async ValueTask<string> DoRequest(BannerType bannerType, string tokensRaw)
 	{
-		var tokensRaw = HttpContext.Session.GetString("tokens");
+		if (tokensRaw is null or "") return string.Empty;
 
-		if (tokensRaw is null or "") return await new StringContent(string.Empty).ReadAsStreamAsync().ConfigureAwait(false);
-
-		var tokens   = tokensRaw.Split(',');
+		var tokens   = tokensRaw!.Split(',');
 		var userId   = tokens[0];
 		var serverId = tokens[1];
 		var recordId = tokens[2];
@@ -183,7 +161,7 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 							   .ConfigureAwait(false);
 
 		resp.EnsureSuccessStatusCode();
-		return await resp.Content.ReadAsStreamAsync().ConfigureAwait(false);
+		return await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 	}
 }
 
@@ -191,6 +169,15 @@ public class PullDataDto
 {
 	[JsonProperty("data")]
 	public PullData[] Data = [];
+}
+
+public class SaveData
+{
+	[JsonProperty("data")]
+	public IReadOnlyDictionary<BannerType, BannerData> Data = new Dictionary<BannerType, BannerData>();
+
+	[JsonProperty("tokens")]
+	public string Tokens = string.Empty;
 }
 
 public class BannerData()

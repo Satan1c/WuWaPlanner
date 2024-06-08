@@ -5,7 +5,7 @@
 
 @{
 	ViewData["Title"] = "Pulls";
-	var pullsData = ViewData.Model.Data;
+	var pullsData = ViewData.Model.Data.Data;
 }
 
 @section Scripts
@@ -88,7 +88,7 @@
 										};
 
 							<tr style="display: @(item.Rarity > 3 ? "table-row" : "none")" class="@(bannerTypeName) @color">
-								<th>@item.Name</th>
+								<th>@item.Id</th>
 								<th>@item.Pity.ToString()</th>
 								<th>
 									@($"{item.Time:dd/MM/yyyy}")<br/>@($"{item.Time:HH:mm}")

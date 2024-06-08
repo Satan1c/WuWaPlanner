@@ -5,7 +5,7 @@ namespace WuWaPlanner.Models;
 
 public class PullsViewModel
 {
-	public IReadOnlyDictionary<BannerType, BannerData> Data = new Dictionary<BannerType, BannerData>();
+	public SaveData Data = new();
 }
 
 public struct PullData
@@ -13,8 +13,8 @@ public struct PullData
 	[JsonProperty("qualityLevel")]
 	public byte Rarity;
 
-	[JsonProperty("name")]
-	public string Name;
+	[JsonProperty("resourceId")]
+	public string Id;
 
 	[JsonProperty("time")]
 	public DateTime Time;
