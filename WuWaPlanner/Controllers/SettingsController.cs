@@ -88,7 +88,7 @@ public class SettingsController(IGoogleAuthProvider authProvider, ICacheManager<
 		}
 
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
+		HttpContext.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
 		return RedirectToAction("Settings");
 	}
 }
