@@ -14,10 +14,7 @@ var redis = await ConnectionMultiplexer.ConnectAsync(
 																  }
 													);
 
-builder.Services.AddDataProtection()
-	   .SetApplicationName("WuWaPlanner")
-	   .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
-	   .DisableAutomaticKeyGeneration();
+builder.Services.AddDataProtection().SetApplicationName("WuWaPlanner").PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
 
 builder.Services.AddSession(
 							options =>
@@ -28,7 +25,7 @@ builder.Services.AddSession(
 							}
 						   );
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 
 builder.Services.AddAuthentication(
 								   o =>

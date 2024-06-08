@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 using System.Text;
 using Google.Apis.Auth.AspNetCore3;
 using Google.Apis.Drive.v3;
@@ -104,25 +105,36 @@ public class PullsController(IGoogleAuthProvider authProvider, IHttpClientFactor
 		return RedirectToAction("Pulls");
 	}
 
-	private async ValueTask<Dictionary<BannerType, BannerData>> GrabData()
+	private async ValueTask<IReadOnlyDictionary<BannerType, BannerData>> GrabData()
 	{
-		var tasks = new Dictionary<BannerType, Task<string>>();
+		/*var tasks = new Dictionary<BannerType, Task<string>>();
 
 		foreach (var i in BannerTypes) { tasks[i] = DoRequest(i); }
 
 		var vals = tasks.Values.ToArray();
-		await Task.WhenAll(vals);
+		await Task.WhenAll(vals);*/
 
-		var pairs = tasks.Select(
+		var results = new ConcurrentDictionary<BannerType, BannerData>();
+
+		await Parallel.ForEachAsync(
+									BannerTypes, async (bannerType, token) =>
+												 {
+													 //var data = await JsonSerializer.DeserializeAsync<PullDataDto>(await DoRequest(bannerType), cancellationToken: token);
+													 var data = JsonConvert.DeserializeObject<PullDataDto>(await DoRequest(bannerType));
+													 results[bannerType] = new BannerData(data!.Data);
+												 }
+								   );
+
+		/*var pairs = tasks.Select(
 								 x =>
 								 {
 									 var pullsRaw = JsonConvert.DeserializeObject<PullDataDto>(x.Value.Result)!.Data;
 									 var result   = new BannerData(pullsRaw);
 									 return new KeyValuePair<BannerType, BannerData>(x.Key, result);
 								 }
-								);
+								);*/
 
-		return new Dictionary<BannerType, BannerData>(pairs);
+		return results;
 	}
 
 	private async Task<string> DoRequest(BannerType bannerType)
