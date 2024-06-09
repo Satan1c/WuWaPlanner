@@ -1,4 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+COPY ["WuWaPlanner/bin/Localizations", "Localizations/"]
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -10,7 +11,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["WuWaPlanner/WuWaPlanner.csproj", "WuWaPlanner/"]
-COPY ["WuWaPlanner/bin/Localizations", "Localizations/"]
 RUN dotnet restore "WuWaPlanner/WuWaPlanner.csproj"
 COPY . .
 WORKDIR "/src/WuWaPlanner"
