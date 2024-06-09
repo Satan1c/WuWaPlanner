@@ -1,11 +1,17 @@
-﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using WuWaPlanner.Controllers
+@using WuWaPlanner.Extensions
 @using WuWaPlanner.Models
+@using WuWaPlanner.Services.CsvManager.Models
 @model PullsViewModel
-
+@inject IViewLocalizer                 Localizer
 @{
 	ViewData["Title"] = "Pulls";
-	var pullsData = ViewData.Model.Data.Data;
+	var pullsData     = ViewData.Model.Data.Data;
+	var pullItemLang  = LangRow.LangParse(Localizer["PullItemLang"].Value);
+	var openCloseText = Localizer["BannerButtonOpenClose"].Value.Split('/');
+	var tableHeaders  = Localizer["BannerTableHeader"].Value.Split('/');
 }
 
 @section Scripts
@@ -16,7 +22,7 @@
 			const table = document.getElementById(this.getAttribute('data-target'));
 
 			table.style.display = table.style.display === 'none' ? 'table' : 'none';
-			button.target.innerText = table.style.display === 'none' ? 'Open' : 'Close';
+			button.target.innerText = table.style.display === 'none' ? this.getAttribute('text-open') : this.getAttribute('text-close');
 		});
 	});
 
@@ -37,22 +43,25 @@
 </div>
 
 <div class="history grid-container container flex flex-wrap">
-	@foreach (var bannerType in PullsController.BannerTypes.AsParallel())
+	@foreach (var bannerType in PullsController.BannerTypes)
 	{
 		var     hasPulls       = pullsData.TryGetValue(bannerType, out var data);
 		var bannerTypeName = bannerType.BannerTypeToString();
 
 		<div class="history-item grid-item w-full inline-flex flex-col">
 
-			<p class="bannerType">@bannerTypeName pulls</p>
+			<p class="bannerType">@Localizer[bannerTypeName]</p>
 			<text>Total: @(data?.Total.ToString() ?? "0")</text>
 			<br/>
-			<text>5* pity: @(data?.LegendaryPity.ToString() ?? "0")</text>
+			<text>5* @tableHeaders[1]: @(data?.LegendaryPity.ToString() ?? "0")</text>
 			<br/>
-			<text>4* pity: @(data?.EpicPity.ToString() ?? "0")</text>
+			<text>4* @tableHeaders[1]: @(data?.EpicPity.ToString() ?? "0")</text>
 			<br/><br/>
 
-			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName">Open</text>
+			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName" text-open="@openCloseText[0]"
+				  text-close="@openCloseText[1]">
+				@openCloseText[0]
+			</text>
 			<br/><br/>
 			<div style="display: none;" id="@bannerTypeName" class="w-full">
 				<div class="grid-container">
@@ -69,9 +78,9 @@
 
 				<table class="w-full">
 					<thead class="w-full">
-					<th style="align-self: center">Name</th>
-					<th style="align-self: center">Pity</th>
-					<th style="align-self: center">Time</th>
+					<th style="align-self: center">@tableHeaders[0]</th>
+					<th style="align-self: center">@tableHeaders[1]</th>
+					<th style="align-self: center">@tableHeaders[2]</th>
 					</thead>
 
 					<tbody>
@@ -79,16 +88,25 @@
 					{
 						@foreach (var item in data!.Pulls)
 						{
-							var color = "rarity "
-										+ item.Rarity switch
-										{
-											5 => "legendary",
-											4 => "epic",
-											_ => "common"
-										};
+							var rarityString = item.Rarity.RarityToString();
+							var color        = "rarity " + rarityString;
+
+							var name  = item.Id;
+							var title = item.Id;
+
+							if (Model.CsvManager.Categories[item.DropType.DropTypeToString()].Data.TryGetValue(item.DropType == DropTypeEnum.Weapons ? name.WeaponIdToType() : rarityString, out var localized))
+							{
+								if (localized.TryGetValue(name, out var val))
+								{
+									name  = val.GetForLocale(pullItemLang);
+									title = val.En;
+								}
+								else
+									await Console.Out.WriteLineAsync($"{name} not found for {item.DropType.DropTypeToString()} {name.WeaponIdToType()} {rarityString}");
+							}
 
 							<tr style="display: @(item.Rarity > 3 ? "table-row" : "none")" class="@(bannerTypeName) @color">
-								<th>@item.Id</th>
+								<th title="@title">@name</th>
 								<th>@item.Pity.ToString()</th>
 								<th>
 									@($"{item.Time:dd/MM/yyyy}")<br/>@($"{item.Time:HH:mm}")

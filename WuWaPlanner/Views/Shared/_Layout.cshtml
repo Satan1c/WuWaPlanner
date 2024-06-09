@@ -1,4 +1,15 @@
-﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
+@inject IViewLocalizer                       Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@{
+	string returnUrl = ViewContext.HttpContext.Request.Path;
+
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+	var cultureItems   = LocOptions.Value.SupportedUICultures?.Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName }).ToList();
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +22,7 @@
 </head>
 <body>
 <header>
-	<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+	<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
 		<div class="container-fluid">
 			<a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Home">WuWaPlanner</a>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
@@ -22,10 +33,25 @@
 			<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 				<ul class="navbar-nav flex-grow-1">
 					<li class="nav-item">
-						<a class="nav-link text-light" asp-area="" asp-controller="Pulls" asp-action="Pulls">Pulls</a>
+						<a class="nav-link text-light" asp-area="" asp-controller="Pulls" asp-action="Pulls">@Localizer["PullsText"]</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link text-light" asp-area="" asp-controller="Settings" asp-action="Settings">Settings</a>
+						<a class="nav-link text-light" asp-area="" asp-controller="Settings"
+						   asp-action="Settings">
+							@Localizer["SettingsText"]
+						</a>
+					</li>
+					<li class="nav-item">
+						<form asp-action="ChangeLanguage" asp-controller="Home" method="post">
+							<input type="hidden" id="returnUrl" name="returnUrl" value="@returnUrl"/>
+							<select id="culture"
+									name="culture"
+									class="form-control"
+									onchange="this.form.submit();"
+									asp-items="cultureItems"
+									asp-for="@requestCulture!.RequestCulture.UICulture.Name">
+							</select>
+						</form>
 					</li>
 				</ul>
 			</div>

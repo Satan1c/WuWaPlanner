@@ -1,11 +1,14 @@
 ﻿using Newtonsoft.Json;
 using WuWaPlanner.Controllers;
+using WuWaPlanner.Services.CsvManager;
+using WuWaPlanner.Services.CsvManager.Models;
 
 namespace WuWaPlanner.Models;
 
 public class PullsViewModel
 {
-	public SaveData Data = new();
+	public required CsvManager<LangRow> CsvManager = null!;
+	public          SaveData            Data       = new();
 }
 
 public struct PullData

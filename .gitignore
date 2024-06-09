@@ -1,9 +1,11 @@
-bin/
-obj/
+bin/[Dd]ebug
+bin/[Rr]elease
+obj/*
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-**/obj/
-**/bin/
+**/obj/*
+**/bin/[Dd]ebug
+**/bin/[Rr]elease
 .idea/
 **/.idea/

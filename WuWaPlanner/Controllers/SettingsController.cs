@@ -70,7 +70,7 @@ public class SettingsController(IGoogleAuthProvider authProvider, ICacheManager<
 		var encoded = Encoding.UTF8.GetString(download.GetBuffer());
 		var data    = JsonConvert.DeserializeObject<SaveData>(encoded, s_jsonSettings)!;
 		m_cacheManager.AddOrUpdate(data.Tokens, data, _ => data);
-		HttpContext.Response.Cookies.Append("tokens", data.Tokens);
+		HttpContext.Response.Cookies.Append("tokens", data.Tokens, new CookieOptions { MaxAge = TimeSpan.FromDays(45) });
 		return RedirectToAction("Settings");
 	}
 

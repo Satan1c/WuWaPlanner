@@ -1,20 +1,24 @@
+using System.Globalization;
 using System.IO.Compression;
 using CacheManager.Core;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using StackExchange.Redis;
 using WuWaPlanner.Controllers;
+using WuWaPlanner.Services.CsvManager;
+using WuWaPlanner.Services.CsvManager.Models;
 
 var builder  = WebApplication.CreateBuilder(args);
-var rediscfg = Environment.GetEnvironmentVariable("RedisConfig")!.Split(',');
+var redisCfg = Environment.GetEnvironmentVariable("RedisConfig")!.Split(',');
 
 var redis = await ConnectionMultiplexer.ConnectAsync(
-													 rediscfg[0], options =>
+													 redisCfg[0], options =>
 																  {
-																	  options.User     = rediscfg[1];
-																	  options.Password = rediscfg[2];
+																	  options.User     = redisCfg[1];
+																	  options.Password = redisCfg[2];
 																  }
 													);
 
@@ -33,7 +37,29 @@ var cache = CacheFactory.Build<SaveData>(
 															 .DisableStatistics()
 										);
 
+builder.Services.AddSingleton(
+							  new CsvManager<LangRow>(
+													  string.Concat(
+																	Path.GetFullPath("../../", AppDomain.CurrentDomain.BaseDirectory),
+																	"Localizations"
+																   )
+													 )
+							 );
+
 builder.Services.AddResponseCaching();
+builder.Services.AddLocalization();
+
+builder.Services.Configure<RequestLocalizationOptions>(
+													   options =>
+													   {
+														   options.DefaultRequestCulture = new RequestCulture("En");
+
+														   var cultures = new CultureInfo[] { new("En"), new("Ru"), new("Uk") };
+
+														   options.SupportedCultures   = cultures;
+														   options.SupportedUICultures = cultures;
+													   }
+													  );
 
 builder.Services.AddDataProtection()
 	   .SetApplicationName("WuWaPlanner")
@@ -61,7 +87,7 @@ builder.Services.AddResponseCompression(
 
 builder.Services.Configure<BrotliCompressionProviderOptions>(options => { options.Level = CompressionLevel.SmallestSize; });
 
-builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+builder.Services.AddControllersWithViews().AddNewtonsoftJson().AddViewLocalization();
 
 builder.Services.AddAuthentication(
 								   o =>
@@ -111,6 +137,8 @@ if (!app.Environment.IsDevelopment())
 	app.UseExceptionHandler("/error");
 	app.UseHsts();
 }
+
+app.UseRequestLocalization();
 
 app.UseResponseCaching();
 app.UseResponseCompression();

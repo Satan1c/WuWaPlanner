@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using WuWaPlanner.Extensions;
 using WuWaPlanner.Models;
+using WuWaPlanner.Services.CsvManager;
+using WuWaPlanner.Services.CsvManager.Models;
 using File = Google.Apis.Drive.v3.Data.File;
 
 namespace WuWaPlanner.Controllers;
@@ -18,7 +20,8 @@ namespace WuWaPlanner.Controllers;
 public class PullsController(
 		IGoogleAuthProvider     authProvider,
 		IHttpClientFactory      httpClientFactory,
-		ICacheManager<SaveData> cacheManager
+		ICacheManager<SaveData> cacheManager,
+		CsvManager<LangRow>     csvManager
 ) : Controller
 {
 	private static readonly JsonSerializerSettings s_jsonSettings = new()
@@ -36,6 +39,7 @@ public class PullsController(
 	private static readonly SaveData                s_emptyData         = new();
 	private readonly        IGoogleAuthProvider     m_authProvider      = authProvider;
 	private readonly        ICacheManager<SaveData> m_cacheManager      = cacheManager;
+	private readonly        CsvManager<LangRow>     m_csvManager        = csvManager;
 	private readonly        IHttpClientFactory      m_httpClientFactory = httpClientFactory;
 
 	[Route("")]
@@ -44,34 +48,43 @@ public class PullsController(
 	{
 		var existed = HttpContext.Request.Cookies.TryGetValue("tokens", out var tokens) ? m_cacheManager.Get(tokens) : null;
 
-		if (existed is null && (User.Identity?.IsAuthenticated ?? false))
+		if (existed is null)
 		{
-			var cred = await m_authProvider.GetCredentialAsync();
-
-			var google = new DriveService(
-										  new BaseClientService.Initializer
-										  {
-											  HttpClientInitializer = cred, ApplicationName = "AftertaleAU"
-										  }
-										 );
-
-			var files = google.Files.List();
-			files.Spaces = "appDataFolder";
-			var appDataFolder = await files.ExecuteAsync();
-
-			if (appDataFolder.Files.Count > 0)
+			if (User.Identity?.IsAuthenticated ?? false)
 			{
-				using var data = new MemoryStream();
-				await google.Files.Get(appDataFolder.Files.First().Id).DownloadAsync(data);
+				var cred = await m_authProvider.GetCredentialAsync();
 
-				var encoded = Encoding.UTF8.GetString(data.GetBuffer());
-				existed = JsonConvert.DeserializeObject<SaveData>(encoded, s_jsonSettings)!;
-				HttpContext.Response.Cookies.Append("tokens", existed.Tokens);
-				m_cacheManager.AddOrUpdate(existed.Tokens, existed, _ => existed);
+				var google = new DriveService(
+											  new BaseClientService.Initializer
+											  {
+												  HttpClientInitializer = cred, ApplicationName = "AftertaleAU"
+											  }
+											 );
+
+				var files = google.Files.List();
+				files.Spaces = "appDataFolder";
+				var appDataFolder = await files.ExecuteAsync();
+
+				if (appDataFolder.Files.Count > 0)
+				{
+					using var data = new MemoryStream();
+					await google.Files.Get(appDataFolder.Files.First().Id).DownloadAsync(data);
+
+					var encoded = Encoding.UTF8.GetString(data.GetBuffer());
+					existed = JsonConvert.DeserializeObject<SaveData>(encoded, s_jsonSettings)!;
+					HttpContext.Response.Cookies.Append("tokens", existed.Tokens, new CookieOptions { MaxAge = TimeSpan.FromDays(45) });
+					m_cacheManager.AddOrUpdate(existed.Tokens, existed, _ => existed);
+				}
+			}
+			else if (tokens is not null)
+			{
+				var data = await GrabData(tokens).ConfigureAwait(false);
+				m_cacheManager.AddOrUpdate(tokens, data, _ => data);
+				HttpContext.Response.Cookies.Append("tokens", tokens, new CookieOptions { MaxAge = TimeSpan.FromDays(45) });
 			}
 		}
 
-		return View(new PullsViewModel { Data = existed ?? s_emptyData });
+		return View(new PullsViewModel { Data = existed ?? s_emptyData, CsvManager = m_csvManager });
 	}
 
 	[HttpGet("import")]
@@ -82,13 +95,13 @@ public class PullsController(
 	}
 
 	[HttpPost("import")]
-	[AutoValidateAntiforgeryToken]
 	public async ValueTask<IActionResult> PullsImport([FromForm] PullsDataForm dataForm)
 	{
 		if (!ModelState.IsValid) return View();
 
 		var data = await GrabData(dataForm.Tokens).ConfigureAwait(false);
 		m_cacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
+		HttpContext.Response.Cookies.Append("tokens", dataForm.Tokens);
 
 		if (User.Identity?.IsAuthenticated ?? false)
 		{
@@ -111,7 +124,6 @@ public class PullsController(
 			await service.Files.Update(file, existed.Id, stream, "application/json").UploadAsync();
 		}
 
-		HttpContext.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
 		return RedirectToAction("Pulls");
 	}
 

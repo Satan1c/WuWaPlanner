@@ -1,5 +1,7 @@
-﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model WuWaPlanner.Models.SettingsViewModel
+@inject IViewLocalizer                                       Localizer
 @{
 	ViewData["Title"] = "Settings";
 }
@@ -7,10 +9,10 @@
 <div>
 	@if (Model.IsAuthorized)
 	{
-		<a class="nav-link text-light" asp-area="" asp-controller="Settings" asp-action="Logout">Logout</a>
+		<a class="nav-link text-light" asp-area="" asp-controller="Settings" asp-action="Logout">@Localizer["LogoutText"]</a>
 	}
 	else
 	{
-		<a class="nav-link text-light" asp-area="" asp-controller="Settings" asp-action="GoogleLogin">Login</a>
+		<a class="nav-link text-light" asp-area="" asp-controller="Settings" asp-action="GoogleLogin">@Localizer["LoginText"]</a>
 	}
 </div>
