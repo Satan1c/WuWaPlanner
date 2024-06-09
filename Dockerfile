@@ -1,4 +1,10 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿FROM ubuntu:lunar
+RUN apt-get update -qy
+RUN apt-get upgrade -qy
+RUN apt-get install -y libfontconfig1 pkg-config fontconfig
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /
 COPY ["WuWaPlanner/bin/Localizations", "Localizations/"]
 USER $APP_UID
 WORKDIR /app
