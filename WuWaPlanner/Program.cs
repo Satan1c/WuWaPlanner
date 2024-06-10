@@ -47,7 +47,7 @@ builder.Services.AddSingleton(
 							 );
 
 builder.Services.AddResponseCaching();
-builder.Services.AddLocalization();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 builder.Services.Configure<RequestLocalizationOptions>(
 													   options =>
