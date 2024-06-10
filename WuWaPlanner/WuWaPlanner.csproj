@@ -100,6 +100,12 @@
 		<EmbeddedResource Update="Views\Pulls\PullsImport.Uk.resx">
 			<DependentUpon>PullsImport.cshtml</DependentUpon>
 		</EmbeddedResource>
+		<EmbeddedResource Update="Views\Shared\_Layout.Ru.resx">
+			<DependentUpon>_Layout.cshtml</DependentUpon>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Views\Shared\_Layout.Uk.resx">
+			<DependentUpon>_Layout.cshtml</DependentUpon>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>
