@@ -81,4 +81,10 @@
 		<Folder Include="Resources\"/>
 	</ItemGroup>
 
+	<ItemGroup>
+		<None Update="Views\Shared\NavBar.css">
+			<DependentUpon>NavBar.cshtml</DependentUpon>
+		</None>
+	</ItemGroup>
+
 </Project>
