@@ -65,47 +65,34 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Update="Views\Home\Home.Ru.resx">
+		<EmbeddedResource Update="Resources\Views\Home\Home.Ru.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>HomeController.En.Designer.cs</LastGenOutput>
 			<DependentUpon>Home.cshtml</DependentUpon>
 		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Home\Home.resx">
+		<EmbeddedResource Include="bin\Localizations\Views\Home\Home.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Home\Home.Ru.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>HomeController.En.Designer.cs</LastGenOutput>
 			<DependentUpon>Home.cshtml</DependentUpon>
 		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Home\Home.Uk.resx">
-			<DependentUpon>Home.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Pulls\Pulls.resx">
-			<DependentUpon>Pulls.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Pulls\PullsImport.resx">
-			<DependentUpon>PullsImport.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Settings\Settings.resx">
-			<DependentUpon>Settings.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Shared\_Layout.resx">
-			<DependentUpon>_Layout.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Pulls\Pulls.Ru.resx">
-			<DependentUpon>Pulls.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Pulls\Pulls.Uk.resx">
-			<DependentUpon>Pulls.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Pulls\PullsImport.Ru.resx">
-			<DependentUpon>PullsImport.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Pulls\PullsImport.Uk.resx">
-			<DependentUpon>PullsImport.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Shared\_Layout.Ru.resx">
-			<DependentUpon>_Layout.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Views\Shared\_Layout.Uk.resx">
-			<DependentUpon>_Layout.cshtml</DependentUpon>
-		</EmbeddedResource>
+		<EmbeddedResource Include="bin\Localizations\Views\Home\Home.Uk.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\PullsImport\PullsImport.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\PullsImport\PullsImport.Ru.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\PullsImport\PullsImport.Uk.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Pulls\Pulls.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Pulls\Pulls.Ru.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Pulls\Pulls.Uk.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Settings\Settings.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Settings\Settings.Ru.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\Settings\Settings.Uk.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\_Layout\_Layout.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\_Layout\_Layout.Ru.resx"/>
+		<EmbeddedResource Include="bin\Localizations\Views\_Layout\_Layout.Uk.resx"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Resources\"/>
 	</ItemGroup>
 
 </Project>
