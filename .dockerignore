@@ -11,6 +11,7 @@
 **/*.*proj.user
 **/*.dbmdl
 **/*.jfm
+**/*.user
 **/azds.yaml
 **/bin/[Dd]ebug
 **/bin/[Rr]elease

@@ -9,3 +9,4 @@ riderModule.iml
 **/bin/[Rr]elease
 .idea/
 **/.idea/
+**/*.user
