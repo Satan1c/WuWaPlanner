@@ -8,7 +8,21 @@
 @{
 	string returnUrl      = ViewContext.HttpContext.Request.Path;
 	var    requestCulture = Context.Features.Get<IRequestCultureFeature>();
-	var    cultureItems   = LocOptions.Value.SupportedUICultures?.Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName }).ToList();
+
+	var cultureItems = LocOptions.Value.SupportedUICultures?.Select(
+																	c => new SelectListItem
+																	{
+																		Value = c.Name,
+																		Text = c.Name switch
+																		{
+																			"en" => "English",
+																			"ru" => "Русский",
+																			"uk" => "Українська",
+																			_    => "unknown"
+																		}
+																	}
+																   )
+								 .ToList();
 }
 
 <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
