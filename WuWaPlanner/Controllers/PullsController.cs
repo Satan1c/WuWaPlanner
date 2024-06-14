@@ -1,5 +1,6 @@
 ﻿using CacheManager.Core;
 using Microsoft.AspNetCore.Mvc;
+using WuWaPlanner.Extensions;
 using WuWaPlanner.Models;
 using WuWaPlanner.Models.CsvManager;
 using WuWaPlanner.Models.KuroGamesService;
@@ -10,10 +11,11 @@ namespace WuWaPlanner.Controllers;
 
 [Route("pulls")]
 public class PullsController(
-		ICacheManager<SaveData> cacheManager,
-		CsvManager<LangRow>     csvManager,
-		KuroGamesService        kuroGamesService,
-		GoogleDriveService      googleDriveService
+		ICacheManager<SaveData>      saveDataCacheManager,
+		ICacheManager<PullsDataForm> pullsDataFormCacheManager,
+		CsvManager<LangRow>          csvManager,
+		KuroGamesService             kuroGamesService,
+		GoogleDriveService           googleDriveService
 ) : Controller
 {
 	public static readonly BannerType[] BannerTypes =
@@ -22,17 +24,21 @@ public class PullsController(
 		BannerType.Beginner, BannerType.BeginnerSelector, BannerType.BeginnerGiftSelector
 	];
 
-	public static readonly SaveData                EmptyData      = new();
-	private readonly       ICacheManager<SaveData> m_cacheManager = cacheManager;
-	private readonly       CsvManager<LangRow>     m_csvManager   = csvManager;
-	private readonly       GoogleDriveService      m_googleDrive  = googleDriveService;
-	private readonly       KuroGamesService        m_kuroGames    = kuroGamesService;
+	private static readonly PullsDataForm                s_emptyPullsDataForm        = new() { Tokens = string.Empty };
+	public static readonly  SaveData                     EmptyData                   = new();
+	private readonly        CsvManager<LangRow>          m_csvManager                = csvManager;
+	private readonly        GoogleDriveService           m_googleDrive               = googleDriveService;
+	private readonly        KuroGamesService             m_kuroGames                 = kuroGamesService;
+	private readonly        ICacheManager<PullsDataForm> m_pullsDataFormCacheManager = pullsDataFormCacheManager;
+
+	private readonly ICacheManager<SaveData> m_saveDataCacheManager = saveDataCacheManager;
 
 	[Route("")]
 	[ResponseCache(Duration = 3888000, Location = ResponseCacheLocation.Client)]
 	public async ValueTask<IActionResult> Pulls()
 	{
-		var existed = HttpContext.Request.Cookies.TryGetValue("tokens", out var tokens) ? m_cacheManager.Get(tokens) : null;
+		var tokens  = HttpContext.ReadTokens();
+		var existed = tokens is null ? null : m_saveDataCacheManager.Get(tokens);
 
 		if (existed is not null) return View(new PullsViewModel { Data = existed, CsvManager = m_csvManager });
 
@@ -41,8 +47,8 @@ public class PullsController(
 
 		if (existed is null) return View(new PullsViewModel { Data = existed ?? EmptyData, CsvManager = m_csvManager });
 
-		m_cacheManager.AddOrUpdate(tokens, existed, _ => existed);
-		HttpContext.Response.Cookies.Append("tokens", tokens!, new CookieOptions { MaxAge = TimeSpan.FromDays(45) });
+		m_saveDataCacheManager.AddOrUpdate(tokens, existed, _ => existed);
+		HttpContext.SaveTokens(tokens!);
 
 		return View(new PullsViewModel { Data = existed, CsvManager = m_csvManager });
 	}
@@ -50,8 +56,13 @@ public class PullsController(
 	[HttpGet("import")]
 	public IActionResult PullsImport()
 	{
-		var tokens = HttpContext.Request.Cookies.TryGetValue("tokens", out var value) ? value : null;
-		return View(new PullsDataForm { Tokens = User.Identity?.IsAuthenticated ?? false ? tokens ?? string.Empty : string.Empty });
+		var tokens = User.Identity?.IsAuthenticated ?? false ? HttpContext.ReadTokens() : null;
+
+		return View(
+					tokens is null
+							? s_emptyPullsDataForm
+							: m_pullsDataFormCacheManager.GetOrAdd(tokens, t => new PullsDataForm { Tokens = t })
+				   );
 	}
 
 	[HttpPost("import")]
@@ -60,8 +71,8 @@ public class PullsController(
 		if (!ModelState.IsValid) return View();
 
 		var data = await m_kuroGames.GrabData(dataForm.Tokens).ConfigureAwait(false);
-		m_cacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
-		HttpContext.Response.Cookies.Append("tokens", dataForm.Tokens);
+		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
+		HttpContext.SaveTokens(dataForm.Tokens);
 
 		if (User.Identity?.IsAuthenticated ?? false) await m_googleDrive.WriteData(data);
 

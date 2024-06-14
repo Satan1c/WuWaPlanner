@@ -9,9 +9,10 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
+using WuWaPlanner.Extensions;
 using WuWaPlanner.Models;
 using WuWaPlanner.Models.CsvManager;
-using WuWaPlanner.Models.KuroGamesService;
+using WuWaPlanner.Models.View;
 using WuWaPlanner.Services;
 
 var builder  = WebApplication.CreateBuilder(args);
@@ -24,21 +25,6 @@ var redis = await ConnectionMultiplexer.ConnectAsync(
 																	  options.Password = redisCfg[2];
 																  }
 													);
-
-var cache = CacheFactory.Build<SaveData>(
-										 nameof(PullDataDto),
-										 settings => settings.WithJsonSerializer()
-															 .WithRedisConfiguration("redis", redis)
-															 .WithSystemRuntimeCacheHandle("system")
-															 .WithExpiration(ExpirationMode.Sliding, TimeSpan.FromDays(45))
-															 .DisablePerformanceCounters()
-															 .DisableStatistics()
-															 .And.WithRedisBackplane("redis")
-															 .WithRedisCacheHandle("redis")
-															 .WithExpiration(ExpirationMode.Sliding, TimeSpan.FromDays(45))
-															 .DisablePerformanceCounters()
-															 .DisableStatistics()
-										);
 
 builder.Services.AddSingleton<KuroGamesService>();
 builder.Services.AddSingleton<GoogleDriveService>();
@@ -89,7 +75,14 @@ builder.Services.AddSession(
 							}
 						   );
 
-builder.Services.AddSingleton(cache);
+builder.Services.AddSingleton(CacheFactory.Build<SaveData>(nameof(SaveData), settings => settings.ApplyConfig(redis)));
+
+builder.Services.AddSingleton(
+							  CacheFactory.Build<PullsDataForm>(
+																nameof(PullsDataForm),
+																settings => settings.ApplyConfig(redis, TimeSpan.FromDays(7))
+															   )
+							 );
 
 builder.Services.AddResponseCompression(
 										options =>
