@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.IO.Compression;
-using CacheManager.Core;
+using CacheManager.Core.Internal;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
@@ -62,14 +62,16 @@ public static class ServiceProviderExtensions
 
 	public static IServiceCollection AddCaches(this IServiceCollection services, IConnectionMultiplexer redis)
 	{
-		return services.AddResponseCaching()
-					   .AddSingleton(
-									 CacheFactory.Build<PullsDataForm>(
-																	   nameof(PullsDataForm),
-																	   settings => settings.ApplyConfig(TimeSpan.FromDays(7))
-																	  )
-									)
-					   .AddSingleton(CacheFactory.Build<SaveData>(nameof(SaveData), settings => settings.ApplyConfigWithRedis(redis)));
+		TypeCache.RegisterResolveType(
+									  s =>
+									  {
+										  if (s.Contains("SaveData")) return typeof(SaveData);
+
+										  return s == typeof(PullsDataForm).FullName ? typeof(PullsDataForm) : null;
+									  }
+									 );
+
+		return services.AddResponseCaching().AddSingleton(new CacheService(redis));
 	}
 
 	public static IServiceCollection AddGoogleAuthenticate(this IServiceCollection services)

@@ -16,7 +16,7 @@ public static class CacheConfigurationExtensions
 		=> options.WithJsonSerializer().AddSystem(expiration);
 
 	private static ConfigurationBuilderCacheHandlePart AddSystem(this ConfigurationBuilderCachePart options, TimeSpan? expiration = null)
-		=> options.WithSystemRuntimeCacheHandle("system")
+		=> options.WithSystemRuntimeCacheHandle()
 				  .WithExpiration(ExpirationMode.Sliding, expiration ?? TimeSpan.FromDays(45))
 				  .DisablePerformanceCounters()
 				  .DisableStatistics();

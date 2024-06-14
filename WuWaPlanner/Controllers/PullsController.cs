@@ -11,11 +11,10 @@ namespace WuWaPlanner.Controllers;
 
 [Route("pulls")]
 public class PullsController(
-		ICacheManager<SaveData>      saveDataCacheManager,
-		ICacheManager<PullsDataForm> pullsDataFormCacheManager,
-		CsvManager<LangRow>          csvManager,
-		KuroGamesService             kuroGamesService,
-		GoogleDriveService           googleDriveService
+		CacheService        cacheService,
+		CsvManager<LangRow> csvManager,
+		KuroGamesService    kuroGamesService,
+		GoogleDriveService  googleDriveService
 ) : Controller
 {
 	public static readonly BannerType[] BannerTypes =
@@ -24,14 +23,14 @@ public class PullsController(
 		BannerType.Beginner, BannerType.BeginnerSelector, BannerType.BeginnerGiftSelector
 	];
 
-	private static readonly PullsDataForm                s_emptyPullsDataForm        = new() { Tokens = string.Empty };
-	public static readonly  SaveData                     EmptyData                   = new();
-	private readonly        CsvManager<LangRow>          m_csvManager                = csvManager;
-	private readonly        GoogleDriveService           m_googleDrive               = googleDriveService;
-	private readonly        KuroGamesService             m_kuroGames                 = kuroGamesService;
-	private readonly        ICacheManager<PullsDataForm> m_pullsDataFormCacheManager = pullsDataFormCacheManager;
+	private static readonly PullsDataForm s_emptyPullsDataForm = new() { Tokens = string.Empty };
+	public static readonly  SaveData      EmptyData            = new();
 
-	private readonly ICacheManager<SaveData> m_saveDataCacheManager = saveDataCacheManager;
+	private readonly CsvManager<LangRow>          m_csvManager                = csvManager;
+	private readonly GoogleDriveService           m_googleDrive               = googleDriveService;
+	private readonly KuroGamesService             m_kuroGames                 = kuroGamesService;
+	private readonly ICacheManager<PullsDataForm> m_pullsDataFormCacheManager = cacheService.PullsDataFormCacheManager;
+	private readonly ICacheManager<SaveData>      m_saveDataCacheManager      = cacheService.SaveDataCacheManager;
 
 	[Route("")]
 	[ResponseCache(Duration = 3888000, Location = ResponseCacheLocation.Client)]
@@ -71,7 +70,7 @@ public class PullsController(
 		if (!ModelState.IsValid) return View();
 
 		var data = await m_kuroGames.GrabData(dataForm.Tokens).ConfigureAwait(false);
-		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
+		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => (SaveData)data);
 		HttpContext.SaveTokens(dataForm.Tokens);
 
 		if (User.Identity?.IsAuthenticated ?? false) await m_googleDrive.WriteData(data);

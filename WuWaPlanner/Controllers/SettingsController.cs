@@ -13,11 +13,11 @@ using WuWaPlanner.Services;
 namespace WuWaPlanner.Controllers;
 
 [Route("settings")]
-public class SettingsController(GoogleDriveService googleDriveService, ICacheManager<SaveData> cacheManager) : Controller
+public class SettingsController(GoogleDriveService googleDriveService, CacheService cacheManager) : Controller
 {
 	private static readonly SettingsViewModel       s_authorizedModel   = new() { IsAuthorized = true };
 	private static readonly SettingsViewModel       s_unAuthorizedModel = new() { IsAuthorized = false };
-	private readonly        ICacheManager<SaveData> m_cacheManager      = cacheManager;
+	private readonly        ICacheManager<SaveData> m_cacheManager      = cacheManager.SaveDataCacheManager;
 	private readonly        GoogleDriveService      m_googleDrive       = googleDriveService;
 
 	[Route("")]
