@@ -27,7 +27,7 @@
 <text id="scriptCopy" class="scriptCopy cursor-pointer">@script</text>
 <br/>
 
-<form asp-action="PullsImport" method="post" enctype="multipart/form-data">
+<form asp-action="PullsImport" method="post" enctype="multipart/form-data" asp-antiforgery="false">
 	<label asp-for="Tokens"></label>
 	<input
 		asp-for="Tokens"

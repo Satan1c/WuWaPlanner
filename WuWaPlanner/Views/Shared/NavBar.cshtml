@@ -45,7 +45,7 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<form asp-action="ChangeLanguage" asp-controller="Home" method="post">
+					<form asp-action="ChangeLanguage" asp-controller="Home" method="post" asp-antiforgery="false">
 						<input type="hidden" id="returnUrl" name="returnUrl" value="@returnUrl"/>
 						<select id="culture"
 								name="culture"

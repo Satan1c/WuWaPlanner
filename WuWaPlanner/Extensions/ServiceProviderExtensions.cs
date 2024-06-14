@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.IO.Compression;
-using CacheManager.Core.Internal;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
@@ -8,9 +7,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
-using WuWaPlanner.Models;
 using WuWaPlanner.Models.CsvManager;
-using WuWaPlanner.Models.View;
 using WuWaPlanner.Services;
 
 namespace WuWaPlanner.Extensions;
@@ -61,18 +58,7 @@ public static class ServiceProviderExtensions
 	}
 
 	public static IServiceCollection AddCaches(this IServiceCollection services, IConnectionMultiplexer redis)
-	{
-		TypeCache.RegisterResolveType(
-									  s =>
-									  {
-										  if (s.Contains("SaveData")) return typeof(SaveData);
-
-										  return s == typeof(PullsDataForm).FullName ? typeof(PullsDataForm) : null;
-									  }
-									 );
-
-		return services.AddResponseCaching().AddSingleton(new CacheService(redis));
-	}
+		=> services.AddResponseCaching().AddSingleton(new CacheService(redis));
 
 	public static IServiceCollection AddGoogleAuthenticate(this IServiceCollection services)
 	{
