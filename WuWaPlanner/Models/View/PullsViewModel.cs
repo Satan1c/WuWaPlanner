@@ -8,4 +8,3 @@ public class PullsViewModel
 	public required CsvManager<LangRow> CsvManager = null!;
 	public          SaveData            Data       = new();
 }
-

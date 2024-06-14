@@ -2,5 +2,5 @@
 
 public class SettingsViewModel
 {
-	public required bool    IsAuthorized;
+	public required bool IsAuthorized;
 }
