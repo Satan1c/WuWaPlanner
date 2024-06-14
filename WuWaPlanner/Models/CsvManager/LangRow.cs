@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 
-namespace WuWaPlanner.Services.CsvManager.Models;
+namespace WuWaPlanner.Models.CsvManager;
 
 public readonly struct LangRow
 {

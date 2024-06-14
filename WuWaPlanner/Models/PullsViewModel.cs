@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using WuWaPlanner.Controllers;
-using WuWaPlanner.Services.CsvManager;
-using WuWaPlanner.Services.CsvManager.Models;
+using WuWaPlanner.Models.CsvManager;
+using WuWaPlanner.Models.KuroGamesService;
+using WuWaPlanner.Services;
 
 namespace WuWaPlanner.Models;
 

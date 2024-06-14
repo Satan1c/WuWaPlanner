@@ -1,7 +1,7 @@
 ﻿using System.Collections.Frozen;
-using WuWaPlanner.Services.CsvManager.Models;
+using WuWaPlanner.Models.CsvManager;
 
-namespace WuWaPlanner.Services.CsvManager;
+namespace WuWaPlanner.Services;
 
 public static class Extensions
 {

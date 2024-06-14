@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace WuWaPlanner.Services.CsvManager.Models;
+namespace WuWaPlanner.Models.CsvManager;
 
 internal ref struct RefList<T>
 {

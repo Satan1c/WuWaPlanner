@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
-using WuWaPlanner.Controllers;
-using WuWaPlanner.Services.CsvManager;
-using WuWaPlanner.Services.CsvManager.Models;
+using WuWaPlanner.Models.CsvManager;
+using WuWaPlanner.Models.KuroGamesService;
+using WuWaPlanner.Services;
 
 var builder  = WebApplication.CreateBuilder(args);
 var redisCfg = Environment.GetEnvironmentVariable("RedisConfig")!.Split(',');
@@ -36,6 +38,17 @@ var cache = CacheFactory.Build<SaveData>(
 															 .DisablePerformanceCounters()
 															 .DisableStatistics()
 										);
+
+builder.Services.AddSingleton<KuroGamesService>();
+builder.Services.AddSingleton<GoogleDriveService>();
+
+builder.Services.AddSingleton(
+							  new JsonSerializerSettings
+							  {
+								  Formatting       = Formatting.None,
+								  ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
+							  }
+							 );
 
 builder.Services.AddSingleton(
 							  new CsvManager<LangRow>(

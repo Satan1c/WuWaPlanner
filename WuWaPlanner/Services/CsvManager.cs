@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using CsvHelper;
 using CsvHelper.Configuration;
-using WuWaPlanner.Services.CsvManager.Models;
+using WuWaPlanner.Models.CsvManager;
 
-namespace WuWaPlanner.Services.CsvManager;
+namespace WuWaPlanner.Services;
 
 public class CsvManager<TRow> where TRow : struct
 {

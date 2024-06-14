@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace WuWaPlanner.Services.CsvManager.Models;
+namespace WuWaPlanner.Models.CsvManager;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum Langs : byte

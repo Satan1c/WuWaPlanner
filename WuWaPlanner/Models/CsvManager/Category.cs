@@ -1,6 +1,6 @@
 ﻿using System.Collections.Frozen;
 
-namespace WuWaPlanner.Services.CsvManager.Models;
+namespace WuWaPlanner.Models.CsvManager;
 
 public readonly struct Category<TRow> where TRow : struct
 {
