@@ -3,7 +3,7 @@ using WuWaPlanner.Extensions;
 
 namespace WuWaPlanner.Models.KuroGamesService;
 
-public class BannerData()
+public struct BannerData()
 {
 	[JsonProperty("pity4")]
 	public byte EpicPity;

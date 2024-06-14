@@ -49,15 +49,12 @@ public class KuroGamesService(JsonSerializerSettings jsonSettings, IHttpClientFa
 			Uid        = userId,
 			Server     = serverId,
 			Record     = recordId,
-			BannerType = (byte)bannerType
+			BannerType = bannerType
 		};
 
 		var resp = await client.PostAsync(
 										  "https://gmserver-api.aki-game2.net/gacha/record/query",
-										  new StringContent(
-															JsonConvert.SerializeObject(request, m_jsonSettings), Encoding.ASCII,
-															"application/json"
-														   )
+										  new StringContent(request.Serialize(), Encoding.ASCII, "application/json")
 										 )
 							   .ConfigureAwait(false);
 

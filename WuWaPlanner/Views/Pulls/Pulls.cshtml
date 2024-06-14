@@ -51,11 +51,11 @@
 		<div class="history-item grid-item w-full inline-flex flex-col">
 
 			<p class="bannerType">@Localizer[bannerTypeName]</p>
-			<text>Total: @(data?.Total.ToString() ?? "0")</text>
+			<text>Total: @(data.Total.ToString())</text>
 			<br/>
-			<text>5* @tableHeaders[1]: @(data?.LegendaryPity.ToString() ?? "0")</text>
+			<text>5* @tableHeaders[1]: @data.LegendaryPity.ToString()</text>
 			<br/>
-			<text>4* @tableHeaders[1]: @(data?.EpicPity.ToString() ?? "0")</text>
+			<text>4* @tableHeaders[1]: @data.EpicPity.ToString()</text>
 			<br/><br/>
 
 			<text class="toggleTableButton cursor-pointer" data-target="@bannerTypeName" text-open="@openCloseText[0]"
@@ -86,7 +86,7 @@
 					<tbody>
 					@if (hasPulls)
 					{
-						@foreach (var item in data!.Pulls)
+						@foreach (var item in data.Pulls)
 						{
 							var rarityString = item.Rarity.RarityToString();
 							var color        = "rarity " + rarityString;

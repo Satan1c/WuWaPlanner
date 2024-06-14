@@ -2,10 +2,10 @@
 
 namespace WuWaPlanner.Models.KuroGamesService;
 
-public class PullsRequest
+public struct PullsRequest()
 {
 	[JsonProperty("cardPoolType")]
-	public required byte BannerType;
+	public required BannerType BannerType;
 
 	[JsonProperty("languageCode")]
 	public string Language = "en";
@@ -18,4 +18,7 @@ public class PullsRequest
 
 	[JsonProperty("playerId")]
 	public required string Uid;
+
+	public string Serialize()
+		=> $@"{{""cardPoolType"":{((byte)BannerType).ToString()},""languageCode"":""{Language}"",""recordId"":""{Record}"",""serverId"":""{Server}"",""playerId"":""{Uid}""}}";
 }

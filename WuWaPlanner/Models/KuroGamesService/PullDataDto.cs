@@ -2,7 +2,7 @@
 
 namespace WuWaPlanner.Models.KuroGamesService;
 
-public class PullDataDto
+public struct PullDataDto()
 {
 	[JsonProperty("data")]
 	public PullData[] Data = [];
