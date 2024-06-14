@@ -15,24 +15,24 @@ public class KuroGamesService(JsonSerializerSettings jsonSettings, IHttpClientFa
 
 	public async ValueTask<SaveData> GrabData(string tokens)
 	{
-		var results = new ConcurrentDictionary<BannerType, BannerData>();
+		var results = new ConcurrentDictionary<BannerTypeEnum, BannerData>();
 
 		await Parallel.ForEachAsync(
 									PullsController.BannerTypes, async (bannerType, _) =>
 																 {
-																	 var data = JsonConvert.DeserializeObject<PullDataDto>(
+																	 var data = JsonConvert.DeserializeObject<PullsDataDto>(
 																		  await DoRequest(bannerType, tokens).ConfigureAwait(false),
 																		  m_jsonSettings
 																		 );
 
-																	 results[bannerType] = new BannerData(data!.Data);
+																	 results[bannerType] = new BannerData(bannerType, data.Data);
 																 }
 								   );
 
 		return new SaveData { Tokens = tokens, Data = results.AsReadOnly() };
 	}
 
-	public async ValueTask<string> DoRequest(BannerType bannerType, string tokensRaw)
+	public async ValueTask<string> DoRequest(BannerTypeEnum bannerTypeEnum, string tokensRaw)
 	{
 		if (tokensRaw is null or "") return string.Empty;
 
@@ -46,10 +46,10 @@ public class KuroGamesService(JsonSerializerSettings jsonSettings, IHttpClientFa
 
 		var request = new PullsRequest
 		{
-			Uid        = userId,
-			Server     = serverId,
-			Record     = recordId,
-			BannerType = bannerType
+			Uid            = userId,
+			Server         = serverId,
+			Record         = recordId,
+			BannerTypeEnum = bannerTypeEnum
 		};
 
 		var resp = await client.PostAsync(

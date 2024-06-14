@@ -39,18 +39,18 @@ public static class ModelsExtensions
 		};
 	}
 
-	public static string BannerTypeToString(this BannerType bannerType)
+	public static string BannerTypeToString(this BannerTypeEnum bannerTypeEnum)
 	{
-		return bannerType switch
+		return bannerTypeEnum switch
 		{
-			BannerType.EventCharacter       => nameof(BannerType.EventCharacter),
-			BannerType.EventWeapon          => nameof(BannerType.EventWeapon),
-			BannerType.StandardCharacter    => nameof(BannerType.StandardCharacter),
-			BannerType.StandardWeapon       => nameof(BannerType.StandardWeapon),
-			BannerType.Beginner             => nameof(BannerType.Beginner),
-			BannerType.BeginnerSelector     => nameof(BannerType.BeginnerSelector),
-			BannerType.BeginnerGiftSelector => nameof(BannerType.BeginnerGiftSelector),
-			_                               => "null"
+			BannerTypeEnum.EventCharacter       => nameof(BannerTypeEnum.EventCharacter),
+			BannerTypeEnum.EventWeapon          => nameof(BannerTypeEnum.EventWeapon),
+			BannerTypeEnum.StandardCharacter    => nameof(BannerTypeEnum.StandardCharacter),
+			BannerTypeEnum.StandardWeapon       => nameof(BannerTypeEnum.StandardWeapon),
+			BannerTypeEnum.Beginner             => nameof(BannerTypeEnum.Beginner),
+			BannerTypeEnum.BeginnerSelector     => nameof(BannerTypeEnum.BeginnerSelector),
+			BannerTypeEnum.BeginnerGiftSelector => nameof(BannerTypeEnum.BeginnerGiftSelector),
+			_                                   => "null"
 		};
 	}
 

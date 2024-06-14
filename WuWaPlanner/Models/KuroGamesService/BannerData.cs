@@ -17,8 +17,12 @@ public struct BannerData()
 	[JsonProperty("total")]
 	public long Total;
 
-	public BannerData(PullData[] pullsRaw) : this()
+	[JsonProperty("bannerType")]
+	public BannerTypeEnum BannerType;
+
+	public BannerData(BannerTypeEnum bannerType, PullData[] pullsRaw) : this()
 	{
+		BannerType = bannerType;
 		var pullsList = pullsRaw.Reverse().CalculatePity().Reverse().ToList();
 		Pulls = pullsList.ToArray();
 		Total = Pulls.LongLength;

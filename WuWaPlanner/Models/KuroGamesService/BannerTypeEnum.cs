@@ -1,6 +1,6 @@
 ﻿namespace WuWaPlanner.Models.KuroGamesService;
 
-public enum BannerType : byte
+public enum BannerTypeEnum : byte
 {
 	EventCharacter       = 1,
 	EventWeapon          = 2,

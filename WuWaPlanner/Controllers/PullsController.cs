@@ -17,10 +17,10 @@ public class PullsController(
 		GoogleDriveService  googleDriveService
 ) : Controller
 {
-	public static readonly BannerType[] BannerTypes =
+	public static readonly BannerTypeEnum[] BannerTypes =
 	[
-		BannerType.EventCharacter, BannerType.EventWeapon, BannerType.StandardCharacter, BannerType.StandardWeapon,
-		BannerType.Beginner, BannerType.BeginnerSelector, BannerType.BeginnerGiftSelector
+		BannerTypeEnum.EventCharacter, BannerTypeEnum.EventWeapon, BannerTypeEnum.StandardCharacter, BannerTypeEnum.StandardWeapon,
+		BannerTypeEnum.Beginner, BannerTypeEnum.BeginnerSelector, BannerTypeEnum.BeginnerGiftSelector
 	];
 
 	private static readonly PullsDataForm s_emptyPullsDataForm = new() { Tokens = string.Empty };
