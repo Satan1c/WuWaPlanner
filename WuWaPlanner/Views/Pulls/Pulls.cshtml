@@ -2,10 +2,10 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using WuWaPlanner.Controllers
 @using WuWaPlanner.Extensions
-@using WuWaPlanner.Models
 @using WuWaPlanner.Models.CsvManager
-@model PullsViewModel
-@inject IViewLocalizer                 Localizer
+@using WuWaPlanner.Models.KuroGamesService
+@model WuWaPlanner.Models.View.PullsViewModel
+@inject IViewLocalizer                                         Localizer
 @{
 	ViewData["Title"] = "Pulls";
 	var pullsData     = ViewData.Model.Data.Data;
@@ -45,7 +45,7 @@
 <div class="history grid-container container flex flex-wrap">
 	@foreach (var bannerType in PullsController.BannerTypes)
 	{
-		var     hasPulls       = pullsData.TryGetValue(bannerType, out var data);
+		var hasPulls       = pullsData.TryGetValue(bannerType, out var data);
 		var bannerTypeName = bannerType.BannerTypeToString();
 
 		<div class="history-item grid-item w-full inline-flex flex-col">

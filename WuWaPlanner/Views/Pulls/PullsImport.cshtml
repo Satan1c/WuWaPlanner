@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model WuWaPlanner.Models.PullsDataForm
-@inject IViewLocalizer                                   Localizer
+@model WuWaPlanner.Models.View.PullsDataForm
+@inject IViewLocalizer                                        Localizer
 @{
 	ViewData["Title"] = "Pulls Import";
 	const string script = """Set-ExecutionPolicy Bypass -Scope Process -Force; [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12; Invoke-Expression (New-Object Net.WebClient).DownloadString("https://gist.githubusercontent.com/Satan1c/8ab58ac8b3dfc24a2582ac5c67e6c95e/raw/53fb6b923ea630111947b2eba894b12e95b3a504/wuwaPlanner.ps1")""";

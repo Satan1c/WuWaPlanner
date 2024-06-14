@@ -1,4 +1,4 @@
-﻿namespace WuWaPlanner.Models;
+﻿namespace WuWaPlanner.Models.View;
 
 public class SettingsViewModel
 {

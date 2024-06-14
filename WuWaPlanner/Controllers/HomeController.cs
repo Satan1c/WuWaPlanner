@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using WuWaPlanner.Models;
+using WuWaPlanner.Models.View;
 
 namespace WuWaPlanner.Controllers;
 

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
+using WuWaPlanner.Models;
 using WuWaPlanner.Models.CsvManager;
 using WuWaPlanner.Models.KuroGamesService;
 using WuWaPlanner.Services;

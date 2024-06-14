@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using WuWaPlanner.Models.KuroGamesService;
 
-namespace WuWaPlanner.Models.KuroGamesService;
+namespace WuWaPlanner.Models;
 
 public class SaveData
 {

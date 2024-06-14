@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WuWaPlanner.Models;
-using WuWaPlanner.Models.KuroGamesService;
+using WuWaPlanner.Models.View;
 using WuWaPlanner.Services;
 
 namespace WuWaPlanner.Controllers;

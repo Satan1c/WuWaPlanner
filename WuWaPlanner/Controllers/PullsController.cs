@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WuWaPlanner.Models;
 using WuWaPlanner.Models.CsvManager;
 using WuWaPlanner.Models.KuroGamesService;
+using WuWaPlanner.Models.View;
 using WuWaPlanner.Services;
 
 namespace WuWaPlanner.Controllers;

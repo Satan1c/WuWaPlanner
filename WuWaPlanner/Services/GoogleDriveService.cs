@@ -4,7 +4,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Newtonsoft.Json;
 using WuWaPlanner.Controllers;
-using WuWaPlanner.Models.KuroGamesService;
+using WuWaPlanner.Models;
 using File = Google.Apis.Drive.v3.Data.File;
 
 namespace WuWaPlanner.Services;

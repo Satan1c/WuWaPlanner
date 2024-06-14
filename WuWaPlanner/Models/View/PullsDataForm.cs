@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WuWaPlanner.Models;
+namespace WuWaPlanner.Models.View;
 
 public class PullsDataForm
 {
