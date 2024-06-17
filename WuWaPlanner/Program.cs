@@ -17,10 +17,7 @@ builder.Services.AddHttpClient().AddLocalizations().AddGoogleAuthenticate().AddC
 
 builder.Services.AddControllersWithViews().AddNewtonsoftJson().AddViewLocalization();
 
-builder.Services.AddDataProtection()
-	   .SetApplicationName("WuWaPlanner")
-	   .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
-	   .DisableAutomaticKeyGeneration();
+builder.Services.AddDataProtection().SetApplicationName("WuWaPlanner").PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
 
 var app = builder.Build();
 

@@ -79,26 +79,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Update="Resources\Views\Home\Home.Ru.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>HomeController.En.Designer.cs</LastGenOutput>
-			<DependentUpon>Home.cshtml</DependentUpon>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Resources\Views\Home\Home.ru.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>HomeController.En.Designer.cs</LastGenOutput>
-			<DependentUpon>Home.cshtml</DependentUpon>
-		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
 		<Folder Include="Resources\"/>
 	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Views\Shared\NavBar.css">
-			<DependentUpon>NavBar.cshtml</DependentUpon>
-		</None>
-	</ItemGroup>
-
 </Project>

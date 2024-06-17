@@ -34,7 +34,7 @@ public class PullsController(
 
 	[Route("")]
 	[ResponseCache(Duration = 3888000, Location = ResponseCacheLocation.Client)]
-	public async ValueTask<IActionResult> Pulls()
+	public async ValueTask<IActionResult> Pulls(CancellationToken cancellationToken)
 	{
 		var tokens  = HttpContext.ReadTokens();
 		var existed = tokens is null ? null : m_saveDataCacheManager.Get(tokens);
@@ -42,7 +42,7 @@ public class PullsController(
 		if (existed is not null) return View(new PullsViewModel { Data = existed, CsvManager = m_csvManager });
 
 		existed = User.Identity?.IsAuthenticated ?? false ? await m_googleDrive.ReadDataOrDefault() :
-				  tokens is not null                      ? await m_kuroGames.GrabData(tokens).ConfigureAwait(false) : null;
+				  tokens is not null ? await m_kuroGames.GrabData(tokens, cancellationToken).ConfigureAwait(false) : null;
 
 		if (existed is null) return View(new PullsViewModel { Data = existed ?? EmptyData, CsvManager = m_csvManager });
 
@@ -65,12 +65,12 @@ public class PullsController(
 	}
 
 	[HttpPost("import")]
-	public async ValueTask<IActionResult> PullsImport([FromForm] PullsDataForm dataForm)
+	public async ValueTask<IActionResult> PullsImport([FromForm] PullsDataForm dataForm, CancellationToken cancellationToken)
 	{
 		if (!ModelState.IsValid) return View();
 
-		var data = await m_kuroGames.GrabData(dataForm.Tokens).ConfigureAwait(false);
-		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => (SaveData)data);
+		var data = await m_kuroGames.GrabData(dataForm.Tokens, cancellationToken).ConfigureAwait(false);
+		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
 		HttpContext.SaveTokens(dataForm.Tokens);
 
 		if (User.Identity?.IsAuthenticated ?? false) await m_googleDrive.WriteData(data);
