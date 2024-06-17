@@ -46,10 +46,10 @@ public class KuroGamesService(JsonSerializerSettings jsonSettings, IHttpClientFa
 
 		var request = new PullsRequest
 		{
-			Uid            = userId,
-			Server         = serverId,
-			Record         = recordId,
-			BannerTypeEnum = bannerTypeEnum
+			Uid        = userId,
+			Server     = serverId,
+			Record     = recordId,
+			BannerType = bannerTypeEnum
 		};
 
 		var resp = await client.PostAsync(

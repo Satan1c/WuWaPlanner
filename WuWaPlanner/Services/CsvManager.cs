@@ -10,7 +10,8 @@ namespace WuWaPlanner.Services;
 
 public class CsvManager<TRow> where TRow : struct
 {
-	public readonly FrozenDictionary<string, Category<TRow>> Categories;
+	private static readonly CsvConfiguration s_csvConfiguration = new(CultureInfo.InvariantCulture) { MissingFieldFound = null };
+	public readonly         FrozenDictionary<string, Category<TRow>> Categories;
 
 	public CsvManager(string filesPath)
 	{
@@ -56,10 +57,7 @@ public class CsvManager<TRow> where TRow : struct
 
 			using var file = File.OpenRead(new string(path));
 
-			using var reader = new CsvReader(
-											 new StreamReader(file),
-											 new CsvConfiguration(CultureInfo.InvariantCulture) { MissingFieldFound = null }
-											);
+			using var reader = new CsvReader(new StreamReader(file), s_csvConfiguration);
 
 			ref var data = ref CollectionsMarshal.GetValueRefOrAddDefault(container, category, out _);
 			data ??= new Dictionary<string, Dictionary<string, TRow>>();
