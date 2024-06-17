@@ -41,7 +41,7 @@ public class PullsController(
 
 		if (existed is not null) return View(new PullsViewModel { Data = existed, CsvManager = m_csvManager });
 
-		existed = User.Identity?.IsAuthenticated ?? false ? await m_googleDrive.ReadDataOrDefault() :
+		existed = User.Identity?.IsAuthenticated ?? false ? await m_googleDrive.ReadDataOrDefault(cancellationToken) :
 				  tokens is not null ? await m_kuroGames.GrabData(tokens, cancellationToken).ConfigureAwait(false) : null;
 
 		if (existed is null) return View(new PullsViewModel { Data = existed ?? EmptyData, CsvManager = m_csvManager });
@@ -73,7 +73,7 @@ public class PullsController(
 		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
 		HttpContext.SaveTokens(dataForm.Tokens);
 
-		if (User.Identity?.IsAuthenticated ?? false) await m_googleDrive.WriteData(data);
+		if (User.Identity?.IsAuthenticated ?? false) await m_googleDrive.WriteData(data, cancellationToken);
 
 		return RedirectToAction("Pulls");
 	}
