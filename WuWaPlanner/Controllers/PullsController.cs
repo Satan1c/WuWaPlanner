@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using System.Collections.Concurrent;
+using CacheManager.Core;
 using Microsoft.AspNetCore.Mvc;
 using WuWaPlanner.Extensions;
 using WuWaPlanner.Models;
@@ -69,7 +70,31 @@ public class PullsController(
 	{
 		if (!ModelState.IsValid) return View();
 
-		var data = await m_kuroGames.GrabData(dataForm.Tokens, cancellationToken).ConfigureAwait(false);
+		var data  = await m_kuroGames.GrabData(dataForm.Tokens, cancellationToken).ConfigureAwait(false);
+		var saved = m_saveDataCacheManager.Get(dataForm.Tokens);
+
+		Parallel.ForEach(
+						 Partitioner.Create(data.Data), pair =>
+														{
+															var dataPulls = pair.Value.Pulls.OrderByDescending(pullData => pullData.Id)
+																				.ToList();
+
+															var pulls = dataPulls.AsParallel();
+
+															if (saved is not null)
+															{
+																var savedPulls = saved.Data[pair.Key]
+																					  .Pulls.AsParallel()
+																					  .Where(pullData => pulls.Contains(pullData))
+																					  .OrderByDescending(pullData => pullData.Id);
+
+																dataPulls.AddRange(savedPulls);
+															}
+
+															data.Data[pair.Key] = new BannerData(pair.Key, pulls.ToArray());
+														}
+						);
+
 		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
 		HttpContext.SaveTokens(dataForm.Tokens);
 

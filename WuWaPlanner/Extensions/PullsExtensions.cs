@@ -6,6 +6,7 @@ public static class PullsExtensions
 {
 	public static IEnumerable<PullData> CalculatePity(this IEnumerable<PullData> pulls)
 	{
+		ulong      id            = 0;
 		byte       legendaryPity = 1;
 		byte       epicPity      = 1;
 		const byte commonPity    = 1;
@@ -13,6 +14,8 @@ public static class PullsExtensions
 		foreach (var i in pulls)
 		{
 			var pull = i;
+
+			pull.Id = ++id;
 
 			switch (i.Rarity)
 			{

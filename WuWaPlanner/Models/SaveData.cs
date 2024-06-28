@@ -3,10 +3,10 @@ using WuWaPlanner.Models.KuroGamesService;
 
 namespace WuWaPlanner.Models;
 
-public class SaveData
+public class SaveData(Dictionary<BannerTypeEnum, BannerData>? data = null)
 {
 	[JsonProperty("data")]
-	public IReadOnlyDictionary<BannerTypeEnum, BannerData> Data = new Dictionary<BannerTypeEnum, BannerData>();
+	public IDictionary<BannerTypeEnum, BannerData> Data = data ?? new Dictionary<BannerTypeEnum, BannerData>();
 
 	[JsonProperty("tokens")]
 	public string Tokens = string.Empty;

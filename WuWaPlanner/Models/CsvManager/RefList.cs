@@ -63,7 +63,7 @@ internal ref struct RefList<T>
 
 	private void AutoResize(int index)
 	{
-		if (m_buffer.Length >= index) return;
+		if (m_buffer.Length > ++index) return;
 
 		var resizer = new T[m_buffer.Length * 2].AsSpan();
 		m_buffer.CopyTo(resizer);

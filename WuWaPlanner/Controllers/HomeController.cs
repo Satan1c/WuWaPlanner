@@ -1,16 +1,13 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using WuWaPlanner.Models.View;
 
 namespace WuWaPlanner.Controllers;
 
 [Route("/")]
-public class HomeController(IStringLocalizer<HomeController> stringLocalizer) : Controller
+public class HomeController : Controller
 {
-	private readonly IStringLocalizer<HomeController> m_stringLocalizer = stringLocalizer;
-
 	[Route("/")]
 	public IActionResult Home() => View();
 

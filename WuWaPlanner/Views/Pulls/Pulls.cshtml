@@ -91,8 +91,8 @@
 							var rarityString = item.Rarity.RarityToString();
 							var color        = "rarity " + rarityString;
 
-							var name  = item.Id;
-							var title = item.Id;
+							var name  = item.ItemId;
+							var title = item.ItemId;
 
 							if (Model.CsvManager.Categories[item.DropType.DropTypeToString()].Data.TryGetValue(item.DropType == DropTypeEnum.Weapons ? name.WeaponIdToType() : rarityString, out var localized))
 							{

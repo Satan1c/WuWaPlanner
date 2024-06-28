@@ -34,7 +34,7 @@ public class KuroGamesService(JsonSerializerSettings jsonSettings, IHttpClientFa
 																					}
 								   );
 
-		return new SaveData { Tokens = tokens, Data = results.AsReadOnly() };
+		return new SaveData { Tokens = tokens, Data = results };
 	}
 
 	public async ValueTask<string> DoRequest(BannerTypeEnum bannerTypeEnum, string tokensRaw, CancellationToken cancellationToken = default)
