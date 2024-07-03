@@ -70,9 +70,7 @@ public class PullsController(
 	{
 		if (!ModelState.IsValid) return View();
 
-		var isAuth = User.Identity?.IsAuthenticated ?? false;
-		Console.WriteLine(isAuth);
-
+		var isAuth    = User.Identity?.IsAuthenticated ?? false;
 		var grabData  = await m_kuroGames.GrabData(dataForm.Tokens, cancellationToken).ConfigureAwait(false);
 		var savedData = m_saveDataCacheManager.Get(dataForm.Tokens);
 

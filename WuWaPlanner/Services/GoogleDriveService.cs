@@ -16,9 +16,10 @@ public class GoogleDriveService(IGoogleAuthProvider authProvider, JsonSerializer
 	private const string c_applicationName = "AftertaleAU";
 	private const string c_contentType     = "application/json";
 
-	private static readonly string[]            s_parents      = [c_appDataFolder];
-	private static readonly File                s_fileData     = new() { Parents = s_parents, Name = c_fileName };
-	private readonly        IGoogleAuthProvider m_authProvider = authProvider;
+	private static readonly string[]            s_parents        = [c_appDataFolder];
+	private static readonly File                s_fileData       = new() { Parents = s_parents, Name = c_fileName };
+	private static readonly File                s_fileUpdateData = new() { Name    = c_fileName };
+	private readonly        IGoogleAuthProvider m_authProvider   = authProvider;
 
 	private readonly byte[] m_encodedEmptyData
 			= Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new Dictionary<string, string>(), jsonSettings));
@@ -70,7 +71,7 @@ public class GoogleDriveService(IGoogleAuthProvider authProvider, JsonSerializer
 			return;
 		}
 
-		await service.Files.Update(s_fileData, existed.Id, stream, c_contentType).UploadAsync(cancellationToken);
+		await service.Files.Update(s_fileUpdateData, existed.Id, stream, c_contentType).UploadAsync(cancellationToken);
 	}
 
 	public async ValueTask<SaveData?> ReadDataOrDefault(CancellationToken cancellationToken = default)
