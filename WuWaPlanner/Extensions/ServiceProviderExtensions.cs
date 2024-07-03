@@ -15,7 +15,8 @@ namespace WuWaPlanner.Extensions;
 public static class ServiceProviderExtensions
 {
 	public static IServiceCollection AddServices(this IServiceCollection services)
-		=> services.AddSingleton<KuroGamesService>()
+		=> services.AddSingleton<GarbageCollection>()
+				   .AddSingleton<KuroGamesService>()
 				   .AddSingleton<GoogleDriveService>()
 				   .AddResponseCompression(
 										   options =>

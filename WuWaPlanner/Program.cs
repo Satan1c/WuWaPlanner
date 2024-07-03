@@ -1,6 +1,11 @@
+using System.Runtime;
 using Microsoft.AspNetCore.DataProtection;
+using NCrontab.Scheduler;
 using StackExchange.Redis;
 using WuWaPlanner.Extensions;
+using WuWaPlanner.Services;
+
+GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
 
 var builder  = WebApplication.CreateBuilder(args);
 var redisCfg = Environment.GetEnvironmentVariable("RedisConfig")!.Split(',');
@@ -13,7 +18,7 @@ var redis = await ConnectionMultiplexer.ConnectAsync(
 																  }
 													);
 
-builder.Services.AddHttpClient().AddLocalizations().AddGoogleAuthenticate().AddCaches(redis).AddServices();
+builder.Services.AddHttpClient().AddLocalizations().AddGoogleAuthenticate().AddCaches(redis).AddServices().AddScheduler();
 
 builder.Services.AddControllersWithViews().AddNewtonsoftJson().AddViewLocalization();
 
@@ -44,5 +49,8 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapControllerRoute("default",     "{controller=Home}/{action=Home}/{id?}");
 app.MapControllerRoute("signin-oidc", "{controller=Home}/{action=Signin}");
+
+app.Services.GetRequiredService<IScheduler>().Start();
+app.Services.GetRequiredService<GarbageCollection>();
 
 app.Run($"{Environment.GetEnvironmentVariable("HOST")}:{Environment.GetEnvironmentVariable("PORT")}");
