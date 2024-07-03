@@ -20,13 +20,14 @@ public class KuroGamesService(JsonSerializerSettings jsonSettings, IHttpClientFa
 		await Parallel.ForEachAsync(
 									PullsController.BannerTypes, cancellationToken, async (bannerType, token) =>
 																					{
+																						var json = await DoRequest(
+																									 bannerType, tokens, token
+																									)
+																								.ConfigureAwait(false);
+
 																						var data = JsonConvert
 																								.DeserializeObject<PullsDataDto>(
-																									 await DoRequest(
-																												  bannerType, tokens, token
-																												 )
-																											 .ConfigureAwait(false),
-																									 m_jsonSettings
+																									 json, m_jsonSettings
 																									);
 
 																						results[bannerType]

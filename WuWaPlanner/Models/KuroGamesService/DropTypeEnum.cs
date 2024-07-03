@@ -1,7 +1,11 @@
-﻿namespace WuWaPlanner.Models.KuroGamesService;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
+namespace WuWaPlanner.Models.KuroGamesService;
+
+[JsonConverter(typeof(StringEnumConverter))]
 public enum DropTypeEnum : byte
 {
-	Weapons,
-	Resonators
+	Weapon,
+	Resonator
 }

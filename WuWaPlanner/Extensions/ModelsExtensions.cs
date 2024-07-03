@@ -10,9 +10,9 @@ public static class ModelsExtensions
 	{
 		return dropType switch
 		{
-			DropTypeEnum.Weapons    => nameof(DropTypeEnum.Weapons),
-			DropTypeEnum.Resonators => nameof(DropTypeEnum.Resonators),
-			_                       => string.Empty
+			DropTypeEnum.Weapon    => nameof(DropTypeEnum.Weapon),
+			DropTypeEnum.Resonator => nameof(DropTypeEnum.Resonator),
+			_                      => string.Empty
 		};
 	}
 

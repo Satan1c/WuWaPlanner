@@ -30,16 +30,16 @@
 		</Content>
 		<Content Include="bin\Data\characters\characters.info.csv"/>
 		<Content Include="bin\Localizations\items\items.leveling_resource.csv"/>
-		<Content Include="bin\Localizations\Resonators\Resonators.epic.csv"/>
-		<Content Include="bin\Localizations\Resonators\Resonators.legendary.csv"/>
+		<Content Include="bin\Localizations\Resonators\Resonator.epic.csv"/>
+		<Content Include="bin\Localizations\Resonators\Resonator.legendary.csv"/>
 		<Content Include="bin\Localizations\items\items.character.csv"/>
 		<Content Include="bin\Localizations\items\items.exp.csv"/>
 		<Content Include="bin\Localizations\items\items.leveling_material.csv"/>
-		<Content Include="bin\Localizations\Weapons\Weapons.broadblade.csv"/>
-		<Content Include="bin\Localizations\Weapons\Weapons.gauntlets.csv"/>
-		<Content Include="bin\Localizations\Weapons\Weapons.pistols.csv"/>
-		<Content Include="bin\Localizations\Weapons\Weapons.rectifier.csv"/>
-		<Content Include="bin\Localizations\Weapons\Weapons.sword.csv"/>
+		<Content Include="bin\Localizations\Weapon\Weapon.broadblade.csv"/>
+		<Content Include="bin\Localizations\Weapon\Weapon.gauntlets.csv"/>
+		<Content Include="bin\Localizations\Weapon\Weapon.pistols.csv"/>
+		<Content Include="bin\Localizations\Weapon\Weapon.rectifier.csv"/>
+		<Content Include="bin\Localizations\Weapon\Weapon.sword.csv"/>
 	</ItemGroup>
 
 	<ItemGroup>

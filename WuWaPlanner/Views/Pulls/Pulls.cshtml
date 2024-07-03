@@ -94,7 +94,7 @@
 							var name  = item.ItemId;
 							var title = item.ItemId;
 
-							if (Model.CsvManager.Categories[item.DropType.DropTypeToString()].Data.TryGetValue(item.DropType == DropTypeEnum.Weapons ? name.WeaponIdToType() : rarityString, out var localized))
+							if (Model.CsvManager.Categories[item.DropType.DropTypeToString()].Data.TryGetValue(item.DropType == DropTypeEnum.Weapon ? name.WeaponIdToType() : rarityString, out var localized))
 							{
 								if (localized.TryGetValue(name, out var val))
 								{

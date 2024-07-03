@@ -70,35 +70,55 @@ public class PullsController(
 	{
 		if (!ModelState.IsValid) return View();
 
-		var data  = await m_kuroGames.GrabData(dataForm.Tokens, cancellationToken).ConfigureAwait(false);
-		var saved = m_saveDataCacheManager.Get(dataForm.Tokens);
+		var isAuth = User.Identity?.IsAuthenticated ?? false;
+		Console.WriteLine(isAuth);
+
+		var grabData  = await m_kuroGames.GrabData(dataForm.Tokens, cancellationToken).ConfigureAwait(false);
+		var savedData = m_saveDataCacheManager.Get(dataForm.Tokens);
+
+		if (savedData is null && isAuth) savedData = await m_googleDrive.ReadDataOrDefault(cancellationToken);
 
 		Parallel.ForEach(
-						 Partitioner.Create(data.Data), pair =>
-														{
-															var dataPulls = pair.Value.Pulls.OrderByDescending(pullData => pullData.Id)
-																				.ToList();
-
-															var pulls = dataPulls.AsParallel();
-
-															if (saved is not null)
+						 Partitioner.Create(grabData.Data), pair =>
 															{
-																var savedPulls = saved.Data[pair.Key]
-																					  .Pulls.AsParallel()
-																					  .Where(pullData => pulls.Contains(pullData))
-																					  .OrderByDescending(pullData => pullData.Id);
+																var result  = new RefList<PullData>();
+																var grabbed = pair.Value.Pulls.AsSpan();
 
-																dataPulls.AddRange(savedPulls);
+																if (savedData is not null)
+																{
+																	var saved = savedData.Data[pair.Key].Pulls.AsSpan();
+
+																	if (saved.Length > 0)
+																	{
+																		var same = grabbed.LastIndexOf(saved[0]);
+
+																		if (same == -1) result.AddRange(saved);
+
+																		var pivot = same;
+
+																		while (pivot >= 0)
+																		{
+																			if (grabbed[pivot].Equals(saved[0])) same = pivot;
+
+																			pivot--;
+																		}
+
+																		if (same > 0) result.AddRange(grabbed[..same]);
+
+																		result.AddRange(saved);
+																	}
+																	else { result.AddRange(grabbed); }
+																}
+																else { result.AddRange(grabbed); }
+
+																grabData.Data[pair.Key] = new BannerData(pair.Key, result.ToArray());
 															}
-
-															data.Data[pair.Key] = new BannerData(pair.Key, pulls.ToArray());
-														}
 						);
 
-		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, data, _ => data);
+		m_saveDataCacheManager.AddOrUpdate(dataForm.Tokens, grabData, _ => grabData);
 		HttpContext.SaveTokens(dataForm.Tokens);
 
-		if (User.Identity?.IsAuthenticated ?? false) await m_googleDrive.WriteData(data, cancellationToken);
+		if (isAuth) await m_googleDrive.WriteData(grabData, cancellationToken);
 
 		return RedirectToAction("Pulls");
 	}

@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace WuWaPlanner.Models.KuroGamesService;
 
-public struct PullData
+public struct PullData : IEquatable<PullData>
 {
 	public ulong Id;
 
@@ -16,8 +17,11 @@ public struct PullData
 	public DateTime Time;
 
 	[JsonProperty("resourceType")]
+	[JsonConverter(typeof(StringEnumConverter))]
 	public DropTypeEnum DropType;
 
 	[JsonProperty("pity")]
 	public byte Pity;
+
+	public bool Equals(PullData other) => ItemId == other.ItemId && Time == other.Time && Pity == other.Pity;
 }

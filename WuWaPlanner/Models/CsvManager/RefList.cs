@@ -47,6 +47,17 @@ internal ref struct RefList<T>
 		return item;
 	}
 
+	public void AddRange(Span<T> items)
+	{
+		AutoResize(Count + items.Length);
+
+		foreach (var i in items) { Add(i); }
+	}
+
+	public void AddRange(T[] items) { AddRange(items.AsSpan()); }
+
+	public void AddRange(IEnumerable<T> items) { AddRange(items.ToArray()); }
+
 	public T? FirstOrDefault(Func<T, bool> predicate)
 	{
 		for (var i = 0; i < Count; i++)
